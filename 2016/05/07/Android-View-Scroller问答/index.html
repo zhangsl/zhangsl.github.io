@@ -16,7 +16,7 @@
 <meta property="og:description" content="android中的scroll一般是调用View.scrollTo()函数实现的，另外有一个View.scrollBy()其实现也是View.scrollTo()。关于View.scrollTo()，下面有一些问题来探究一下，本文所查看的代码是android4.2.2的源代码。
 
 问：View.scrollTo()的原理是什么？答：在android.view.View.java中有两个变量mScr">
-<meta property="og:updated_time" content="2016-05-07T08:04:34.000Z">
+<meta property="og:updated_time" content="2016-05-07T08:32:50.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Android View Scroller问答">
 <meta name="twitter:description" content="android中的scroll一般是调用View.scrollTo()函数实现的，另外有一个View.scrollBy()其实现也是View.scrollTo()。关于View.scrollTo()，下面有一些问题来探究一下，本文所查看的代码是android4.2.2的源代码。
@@ -77,7 +77,7 @@
 						<li>Tags</li>
 						
 						
-						<li>About</li>
+						<li>Über</li>
 						
 					</ul>
 				</div>
@@ -218,122 +218,20 @@
         <p>android中的scroll一般是调用View.scrollTo()函数实现的，另外有一个View.scrollBy()其实现也是View.scrollTo()。关于View.scrollTo()，下面有一些问题来探究一下，本文所查看的代码是android4.2.2的源代码。</p>
 <ul>
 <li><p><strong>问：View.scrollTo()的原理是什么？</strong><br>答：在android.view.View.java中有两个变量mScrollX和mScrollY，两个变量的定义如下：</p>
-  <java>
-
-<pre><code>/**
- * The offset, in pixels, by which the content of this view is scrolled
- * horizontally.
- */
-protected int mScrollX;
-
-/**
- * The offset, in pixels, by which the content of this view is scrolled
- * vertically.
- */
-protected int mScrollY;
-</code></pre><p> </p></java><br>在View的绘制过程中，会根据这两个值对里面的内容进行偏移。View.draw()中的代码片段如下：<p></p>
-<java>
-
-<pre><code>int left = mScrollX + paddingLeft;
-int right = left + mRight - mLeft - mPaddingRight - paddingLeft;
-int top = mScrollY + getFadeTop(offsetRequired);
-int bottom = top + getFadeHeight(offsetRequired);
-</code></pre><p></p></java><br>在View.scrollTo()的作用就是就是改变这两个变量，从而引起View的content位置发生变化。<p></p>
+  <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">    </span><br><span class="line"><span class="comment">/**</span><br><span class="line"> * The offset, in pixels, by which the content of this view is scrolled</span><br><span class="line"> * horizontally.</span><br><span class="line"> */</span></span><br><span class="line"><span class="keyword">protected</span> <span class="keyword">int</span> mScrollX;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span><br><span class="line"> * The offset, in pixels, by which the content of this view is scrolled</span><br><span class="line"> * vertically.</span><br><span class="line"> */</span></span><br><span class="line"><span class="keyword">protected</span> <span class="keyword">int</span> mScrollY;</span><br></pre></td></tr></table></figure>
+<p>在View的绘制过程中，会根据这两个值对里面的内容进行偏移。View.draw()中的代码片段如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"> </span><br><span class="line">        <span class="keyword">int</span> left = mScrollX + paddingLeft;</span><br><span class="line">        <span class="keyword">int</span> right = left + mRight - mLeft - mPaddingRight - paddingLeft;</span><br><span class="line">        <span class="keyword">int</span> top = mScrollY + getFadeTop(offsetRequired);</span><br><span class="line">        <span class="keyword">int</span> bottom = top + getFadeHeight(offsetRequired);</span><br><span class="line">`</span><br></pre></td></tr></table></figure>
+<p>在View.scrollTo()的作用就是就是改变这两个变量，从而引起View的content位置发生变化。</p>
 </li>
 <li><strong>问：Scroll是否引起Layout的改变？</strong><br>答：Scroll只是改变View.mScrollx和View.mScrollY，并且在draw()函数中，根据这两个偏移量进行绘制。所以只是影响draw()，不会引起Layout的改变。</li>
 <li><p><strong>问：如果scroll只是在绘制的时候进行偏移，那么对touch事件的派发是否产生影响，View事件的响应是在scroll前的位置还是scroll后的位置？</strong><br>答：事件的分派是在ViewGroup.dispatchTouchEvent()中，查看源码，发现在寻找响应事件的子View时，会算上mScrollX和mScrollY的偏移。所以scroll是会对事件派发产生影响的。View事件的响应是在scroll后的位置。关键代码如下：</p>
-<java>
-
-<pre><code>protected boolean isTransformedTouchPointInView(float x, float y, View child,
-        PointF outLocalPoint) {
-    float localX = x + mScrollX - child.mLeft;
-    float localY = y + mScrollY - child.mTop;
-    if (! child.hasIdentityMatrix() &amp;&amp; mAttachInfo != null) {
-        final float[] localXY = mAttachInfo.mTmpTransformLocation;
-        localXY[0] = localX;
-        localXY[1] = localY;
-        child.getInverseMatrix().mapPoints(localXY);
-        localX = localXY[0];
-        localY = localXY[1];
-    }
-    final boolean isInView = child.pointInView(localX, localY);
-    if (isInView &amp;&amp; outLocalPoint != null) {
-        outLocalPoint.set(localX, localY);
-    }
-    return isInView;
-}
-</code></pre></java></li>
-</ul>
-<p></p>
-<ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">protected boolean isTransformedTouchPointInView(float x, float y, View child,</span><br><span class="line">        PointF outLocalPoint) &#123;</span><br><span class="line">    float localX = x + mScrollX - child.mLeft;</span><br><span class="line">    float localY = y + mScrollY - child.mTop;</span><br><span class="line">    if (! child.hasIdentityMatrix() &amp;&amp; mAttachInfo != null) &#123;</span><br><span class="line">        final float[] localXY = mAttachInfo.mTmpTransformLocation;</span><br><span class="line">        localXY[0] = localX;</span><br><span class="line">        localXY[1] = localY;</span><br><span class="line">        child.getInverseMatrix().mapPoints(localXY);</span><br><span class="line">        localX = localXY[0];</span><br><span class="line">        localY = localXY[1];</span><br><span class="line">    &#125;</span><br><span class="line">    final boolean isInView = child.pointInView(localX, localY);</span><br><span class="line">    if (isInView &amp;&amp; outLocalPoint != null) &#123;</span><br><span class="line">        outLocalPoint.set(localX, localY);</span><br><span class="line">    &#125;</span><br><span class="line">    return isInView;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
 <li><p>问：<strong>Scroller的作用是什么？</strong><br>答：Scroller的作用是帮助Scroll更加顺滑的。如果我们不是想在一段时间内，有A点顺滑的scroll到B点。这样我们就要计算每次draw应该偏移多少，才能达到顺滑的效果。Scroller就是用来帮助计算的。具体的计算方式是在Scroller.computeScrollOffset()函数中。代码如下：</p>
-<java>
-
-<pre><code>public boolean computeScrollOffset() {
-if (mFinished) {
-    return false;
-}
-
-int timePassed = (int)(AnimationUtils.currentAnimationTimeMillis() - mStartTime);
-
-if (timePassed &lt; mDuration) {
-    switch (mMode) {
-    case SCROLL_MODE:
-        float x = timePassed * mDurationReciprocal;
-
-        if (mInterpolator == null)
-            x = viscousFluid(x); 
-        else
-            x = mInterpolator.getInterpolation(x);
-
-        mCurrX = mStartX + Math.round(x * mDeltaX);
-        mCurrY = mStartY + Math.round(x * mDeltaY);
-        break;
-    case FLING_MODE:
-        final float t = (float) timePassed / mDuration;
-        final int index = (int) (NB_SAMPLES * t);
-        float distanceCoef = 1.f;
-        float velocityCoef = 0.f;
-        if (index &lt; NB_SAMPLES) {
-            final float t_inf = (float) index / NB_SAMPLES;
-            final float t_sup = (float) (index + 1) / NB_SAMPLES;
-            final float d_inf = SPLINE_POSITION[index];
-            final float d_sup = SPLINE_POSITION[index + 1];
-            velocityCoef = (d_sup - d_inf) / (t_sup - t_inf);
-            distanceCoef = d_inf + (t - t_inf) * velocityCoef;
-        }
-
-        mCurrVelocity = velocityCoef * mDistance / mDuration * 1000.0f;
-
-        mCurrX = mStartX + Math.round(distanceCoef * (mFinalX - mStartX));
-        // Pin to mMinX &lt;= mCurrX &lt;= mMaxX
-        mCurrX = Math.min(mCurrX, mMaxX);
-        mCurrX = Math.max(mCurrX, mMinX);
-
-        mCurrY = mStartY + Math.round(distanceCoef * (mFinalY - mStartY));
-        // Pin to mMinY &lt;= mCurrY &lt;= mMaxY
-        mCurrY = Math.min(mCurrY, mMaxY);
-        mCurrY = Math.max(mCurrY, mMinY);
-
-        if (mCurrX == mFinalX &amp;&amp; mCurrY == mFinalY) {
-            mFinished = true;
-        }
-
-        break;
-    }
-}
-    else {
-        mCurrX = mFinalX;
-        mCurrY = mFinalY;
-        mFinished = true;
-    }
-    return true;
-}
-</code></pre></java></li>
-</ul>
-<p></p>
-<ul>
-<li><strong>问：Scroll和ValueAnimator的区别是什么？</strong><br>答：ValueAnimator的本质是在一段时间内，按照一定的规律去改变一个值。而scroll就是改变mScrollX和mScrollY的值。所以理论上也可以用ValueAnimator来改变mScrollX和mScrollY，从而达到scroll的目的。</li>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">computeScrollOffset</span><span class="params">()</span> </span>&#123;</span><br><span class="line"><span class="keyword">if</span> (mFinished) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> timePassed = (<span class="keyword">int</span>)(AnimationUtils.currentAnimationTimeMillis() - mStartTime);</span><br><span class="line">    </span><br><span class="line"><span class="keyword">if</span> (timePassed &lt; mDuration) &#123;</span><br><span class="line">    <span class="keyword">switch</span> (mMode) &#123;</span><br><span class="line">    <span class="keyword">case</span> SCROLL_MODE:</span><br><span class="line">        <span class="keyword">float</span> x = timePassed * mDurationReciprocal;</span><br><span class="line">    </span><br><span class="line">        <span class="keyword">if</span> (mInterpolator == <span class="keyword">null</span>)</span><br><span class="line">            x = viscousFluid(x); </span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            x = mInterpolator.getInterpolation(x);</span><br><span class="line">    </span><br><span class="line">        mCurrX = mStartX + Math.round(x * mDeltaX);</span><br><span class="line">        mCurrY = mStartY + Math.round(x * mDeltaY);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">case</span> FLING_MODE:</span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">float</span> t = (<span class="keyword">float</span>) timePassed / mDuration;</span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">int</span> index = (<span class="keyword">int</span>) (NB_SAMPLES * t);</span><br><span class="line">        <span class="keyword">float</span> distanceCoef = <span class="number">1</span>.f;</span><br><span class="line">        <span class="keyword">float</span> velocityCoef = <span class="number">0</span>.f;</span><br><span class="line">        <span class="keyword">if</span> (index &lt; NB_SAMPLES) &#123;</span><br><span class="line">            <span class="keyword">final</span> <span class="keyword">float</span> t_inf = (<span class="keyword">float</span>) index / NB_SAMPLES;</span><br><span class="line">            <span class="keyword">final</span> <span class="keyword">float</span> t_sup = (<span class="keyword">float</span>) (index + <span class="number">1</span>) / NB_SAMPLES;</span><br><span class="line">            <span class="keyword">final</span> <span class="keyword">float</span> d_inf = SPLINE_POSITION[index];</span><br><span class="line">            <span class="keyword">final</span> <span class="keyword">float</span> d_sup = SPLINE_POSITION[index + <span class="number">1</span>];</span><br><span class="line">            velocityCoef = (d_sup - d_inf) / (t_sup - t_inf);</span><br><span class="line">            distanceCoef = d_inf + (t - t_inf) * velocityCoef;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        mCurrVelocity = velocityCoef * mDistance / mDuration * <span class="number">1000.0f</span>;</span><br><span class="line">        </span><br><span class="line">        mCurrX = mStartX + Math.round(distanceCoef * (mFinalX - mStartX));</span><br><span class="line">        <span class="comment">// Pin to mMinX &lt;= mCurrX &lt;= mMaxX</span></span><br><span class="line">        mCurrX = Math.min(mCurrX, mMaxX);</span><br><span class="line">        mCurrX = Math.max(mCurrX, mMinX);</span><br><span class="line">        </span><br><span class="line">        mCurrY = mStartY + Math.round(distanceCoef * (mFinalY - mStartY));</span><br><span class="line">        <span class="comment">// Pin to mMinY &lt;= mCurrY &lt;= mMaxY</span></span><br><span class="line">        mCurrY = Math.min(mCurrY, mMaxY);</span><br><span class="line">        mCurrY = Math.max(mCurrY, mMinY);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (mCurrX == mFinalX &amp;&amp; mCurrY == mFinalY) &#123;</span><br><span class="line">            mFinished = <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        mCurrX = mFinalX;</span><br><span class="line">        mCurrY = mFinalY;</span><br><span class="line">        mFinished = <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>问：Scroll和ValueAnimator的区别是什么？</strong><br>答：ValueAnimator的本质是在一段时间内，按照一定的规律去改变一个值。而scroll就是改变mScrollX和mScrollY的值。所以理论上也可以用ValueAnimator来改变mScrollX和mScrollY，从而达到scroll的目的。</p>
+</li>
 <li><strong>问：Scroll和Animation的区别是什么？</strong><br>答：animation也是通过在draw函数里面实现的，但是animation只是改变了绘制的位置，并没有影响到事件的响应。所以当一个View从A点通过Animation动画移动到B点，View的事件继续在A点才能响应。</li>
 </ul>
 
