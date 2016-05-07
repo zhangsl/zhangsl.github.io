@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" >
+  <title>从Java到Swift | Light&#39;s Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="我们学习的新事物时，通常并不是从0开始，而是从已知开始，将新事物与已知的进行比较分析，从而快速全面地了解新事物。而我熟悉Java，所以在学习Swift时，就会将Swift与Java进行比较，思考。（文中的示例代码均来自The Swift Programming Language）
+概览从Java到Swift还是比较简单的，相比Object-C，Swift和Java的语法更加接近，和最近的Kotli">
+<meta property="og:type" content="article">
+<meta property="og:title" content="从Java到Swift">
+<meta property="og:url" content="http://yoursite.com/2016/05/07/from-java-to-swift/index.html">
+<meta property="og:site_name" content="Light's Blog">
+<meta property="og:description" content="我们学习的新事物时，通常并不是从0开始，而是从已知开始，将新事物与已知的进行比较分析，从而快速全面地了解新事物。而我熟悉Java，所以在学习Swift时，就会将Swift与Java进行比较，思考。（文中的示例代码均来自The Swift Programming Language）
+概览从Java到Swift还是比较简单的，相比Object-C，Swift和Java的语法更加接近，和最近的Kotli">
+<meta property="og:image" content="http://img2.tbcdn.cn/L1/461/1/845a3de12a57bdc5d4e4c3ca34bd72cc8befd66f.png">
+<meta property="og:image" content="http://img1.tbcdn.cn/L1/461/1/36f8571ac833b313ef3800ac748d263016d5d69c.png">
+<meta property="og:image" content="http://img1.tbcdn.cn/L1/461/1/68c256f96b0feef9a57114f2e171c5da33af9b68.png">
+<meta property="og:updated_time" content="2016-05-07T07:52:37.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="从Java到Swift">
+<meta name="twitter:description" content="我们学习的新事物时，通常并不是从0开始，而是从已知开始，将新事物与已知的进行比较分析，从而快速全面地了解新事物。而我熟悉Java，所以在学习Swift时，就会将Swift与Java进行比较，思考。（文中的示例代码均来自The Swift Programming Language）
+概览从Java到Swift还是比较简单的，相比Object-C，Swift和Java的语法更加接近，和最近的Kotli">
+<meta name="twitter:image" content="http://img2.tbcdn.cn/L1/461/1/845a3de12a57bdc5d4e4c3ca34bd72cc8befd66f.png">
+  
+    <link rel="alternative" href="/atom.xml" title="Light&#39;s Blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+	<header id="header" class="inner">
+		<a href="/" class="profilepic">
+			
+			<img lazy-src="null" class="js-avatar">
+			
+		</a>
+
+		<hgroup>
+		  <h1 class="header-author"><a href="/">Light Zhang</a></h1>
+		</hgroup>
+
+		
+
+		
+			<div class="switch-btn">
+				<div class="icon">
+					<div class="icon-ctn">
+						<div class="icon-wrap icon-house" data-idx="0">
+							<div class="birdhouse"></div>
+							<div class="birdhouse_holes"></div>
+						</div>
+						<div class="icon-wrap icon-ribbon hide" data-idx="1">
+							<div class="ribbon"></div>
+						</div>
+						
+						
+						<div class="icon-wrap icon-me hide" data-idx="3">
+							<div class="user"></div>
+							<div class="shoulder"></div>
+						</div>
+						
+					</div>
+					
+				</div>
+				<div class="tips-box hide">
+					<div class="tips-arrow"></div>
+					<ul class="tips-inner">
+						<li>Menu</li>
+						<li>Tags</li>
+						
+						
+						<li>Über</li>
+						
+					</ul>
+				</div>
+			</div>
+		
+
+		<div class="switch-area">
+			<div class="switch-wrap">
+				<section class="switch-part switch-part1">
+					<nav class="header-menu">
+						<ul>
+						
+							<li><a href="/">主页</a></li>
+				        
+							<li><a href="/archives">所有文章</a></li>
+				        
+							<li><a href="/essay/随笔">随笔</a></li>
+				        
+							<li><a href="/android/Android">Android</a></li>
+				        
+							<li><a href="/java/Java">Java</a></li>
+				        
+						</ul>
+					</nav>
+					<nav class="header-nav">
+						<div class="social">
+							
+								<a class="github" target="_blank" href="https://github.com/zhangsl" title="github">github</a>
+					        
+								<a class="rss" target="_blank" href="#" title="rss">rss</a>
+					        
+								<a class="mail" target="_blank" href="/zhang.shuliang@yeah.net" title="mail">mail</a>
+					        
+								<a class="linkedin" target="_blank" href="https://cn.linkedin.com/in/叔亮-张-a6a7b969" title="linkedin">linkedin</a>
+					        
+						</div>
+					</nav>
+				</section>
+				
+				
+				<section class="switch-part switch-part2">
+					<div class="widget tagcloud" id="js-tagcloud">
+						<a href="/tags/AOP/" style="font-size: 10px;">AOP</a> <a href="/tags/Android/" style="font-size: 20px;">Android</a> <a href="/tags/Design/" style="font-size: 10px;">Design</a> <a href="/tags/Event-Driven/" style="font-size: 10px;">Event Driven</a> <a href="/tags/Java/" style="font-size: 15px;">Java</a> <a href="/tags/Swift/" style="font-size: 10px;">Swift</a> <a href="/tags/mobile/" style="font-size: 10px;">mobile</a> <a href="/tags/translation/" style="font-size: 10px;">translation</a>
+					</div>
+				</section>
+				
+				
+				
+
+				
+				
+				<section class="switch-part switch-part3">
+				
+					<div id="js-aboutme">Light is me!</div>
+				</section>
+				
+			</div>
+		</div>
+	</header>				
+</div>
+
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+  	<div class="overlay">
+  		<div class="slider-trigger"></div>
+  		<h1 class="header-author js-mobile-header hide">Light Zhang</h1>
+  	</div>
+	<div class="intrude-less">
+		<header id="header" class="inner">
+			<div class="profilepic">
+			
+				<img lazy-src="null" class="js-avatar">
+			
+			</div>
+			<hgroup>
+			  <h1 class="header-author">Light Zhang</h1>
+			</hgroup>
+			
+			<nav class="header-menu">
+				<ul>
+				
+					<li><a href="/">主页</a></li>
+		        
+					<li><a href="/archives">所有文章</a></li>
+		        
+					<li><a href="/essay/随笔">随笔</a></li>
+		        
+					<li><a href="/android/Android">Android</a></li>
+		        
+					<li><a href="/java/Java">Java</a></li>
+		        
+		        <div class="clearfix"></div>
+				</ul>
+			</nav>
+			<nav class="header-nav">
+				<div class="social">
+					
+						<a class="github" target="_blank" href="https://github.com/zhangsl" title="github">github</a>
+			        
+						<a class="rss" target="_blank" href="#" title="rss">rss</a>
+			        
+						<a class="mail" target="_blank" href="/zhang.shuliang@yeah.net" title="mail">mail</a>
+			        
+						<a class="linkedin" target="_blank" href="https://cn.linkedin.com/in/叔亮-张-a6a7b969" title="linkedin">linkedin</a>
+			        
+				</div>
+			</nav>
+		</header>				
+	</div>
+</nav>
+
+      <div class="body-wrap"><article id="post-from-java-to-swift" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2016/05/07/from-java-to-swift/" class="article-date">
+  	<time datetime="2016-05-07T07:45:46.000Z" itemprop="datePublished">2016-05-07</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      从Java到Swift
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+	<div class="article-tag tagcloud">
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Swift/">Swift</a></li></ul>
+	</div>
+
+        
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>我们学习的新事物时，通常并不是从0开始，而是从已知开始，将新事物与已知的进行比较分析，从而快速全面地了解新事物。<br>而我熟悉Java，所以在学习Swift时，就会将Swift与Java进行比较，思考。（文中的示例代码均来自<a href="https://developer.apple.com/library/ios/documentation/Swift/Conceptual/Swift_Programming_Language/index.html#//apple_ref/doc/uid/TP40014097-CH3-ID0" target="_blank" rel="external">The Swift Programming Language</a>）</p>
+<h3 id="概览"><a href="#概览" class="headerlink" title="概览"></a>概览</h3><p>从Java到Swift还是比较简单的，相比Object-C，Swift和Java的语法更加接近，和最近的Kotlin就更像了。Swift同时支持面向对象编程和函数式编程。Swift比Java功能更加强大，用法更加友好。网上有一份Java和Swift的粗略对比：<br><img src="http://img2.tbcdn.cn/L1/461/1/845a3de12a57bdc5d4e4c3ca34bd72cc8befd66f.png" alt="java vs swift"></p>
+<h3 id="基础部分"><a href="#基础部分" class="headerlink" title="基础部分"></a>基础部分</h3><p>1.Swift没有main函数，这个有点像脚本语言。Swift程序的默认入口是main.swift文件，在iOS应用中，则通常标记了@UIApplicationMain的AppDelegate.swift文件。可以类比到Android中，在AndroidManifest.xml中定义的Application。<br>2.Swift不需要定义行结束符，这个是像脚本语言一样。<br>3.Swift使用var定义变量，一般无需指定具体的数据类型，编译器会自行判断。遇到编译器无法判断的情况，需要自己显式指定。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//Java定义变量</span></span><br><span class="line"><span class="keyword">int</span> x = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">//Swift定义变量，编译器自动识别数据类型</span></span><br><span class="line">var x = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">//Swift定义变量，显式指定类型，否则此时编译器会自动识别成Int</span></span><br><span class="line">var y : Long = <span class="number">0</span>;</span><br></pre></td></tr></table></figure>
+<p>4.Swift用let定义常量，Java里面是static final。<br>5.array跟Java中的array是一样的概念。dictionary就是Java中的map。dictionary的取值的方式是dictionary[key]，接口就像array一样，简洁方便。<br>6.nil在swift中就类似Java中的null。nil是没有初始化成功，是没有值。<br>7.optional value是指该value的值可以是nil，Swift默认一个var是不能赋值nil，除非它声明了optional。optional不能直接输出，而必须unwrap，形如optionalValue!。有点类似于Java中打包好的null判断。也可以用!代替?声明一个无需unwrap的var。</p>
+<h3 id="逻辑控制"><a href="#逻辑控制" class="headerlink" title="逻辑控制"></a>逻辑控制</h3><p>1.Swift的switch 语法和Java及C++很像，但是它没有break，他命中一个case后会自动退出switch。对于几个不同case同样处理的情况，可以case后面连续几个condition，用逗号隔开。</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">switch</span> value &#123;</span><br><span class="line"><span class="keyword">case</span> condition1:</span><br><span class="line">    response to condition <span class="number">1</span></span><br><span class="line"><span class="keyword">case</span> condition2, condition3:</span><br><span class="line">    resoponse to condition <span class="number">2</span> or <span class="number">3</span></span><br><span class="line"><span class="keyword">default</span>:</span><br><span class="line">    otherwise, <span class="keyword">do</span> something <span class="keyword">else</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>2.Swift的switch支持运算，运算的话，就是说不仅仅是equal，而是支持满足特定要求。<br><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> yetAnotherPoint = (<span class="number">1</span>, -<span class="number">1</span>)</span><br><span class="line"><span class="keyword">switch</span> yetAnotherPoint &#123;</span><br><span class="line"><span class="keyword">case</span> <span class="keyword">let</span> (x, y) <span class="keyword">where</span> x == y:</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">"(\(x), \(y)) is on the line x == y"</span>)</span><br><span class="line"><span class="keyword">case</span> <span class="keyword">let</span> (x, y) <span class="keyword">where</span> x == -y:</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">"(\(x), \(y)) is on the line x == -y"</span>)</span><br><span class="line"><span class="keyword">case</span> <span class="keyword">let</span> (x, y):</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">"(\(x), \(y)) is just some arbitrary point"</span>)</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// prints "(1, -1) is on the line x == -y"</span></span><br></pre></td></tr></table></figure></p>
+<p>3.while循环和Java或者C++中基本一致，不过while后面直接写condition，不需要用括号。<br>4.for循环和Java也基本一样，不过也是不需要括号。for循环中，..&lt;的用法比较方便。下划线符号_（替代循环中的变量）能够忽略具体的值，并且不提供循环遍历时对值的访问。for-in则有点类似与Java中for each循环。</p>
+<h3 id="函数"><a href="#函数" class="headerlink" title="函数"></a>函数</h3><p>1.函数的定义和Java很不一样。Swift函数的定义形如 func functionName(argName: Type) -&gt; Return Type:<br><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">sayHelloAgain</span><span class="params">(personName: String)</span></span> -&gt; <span class="type">String</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="string">"Hello again, "</span> + personName + <span class="string">"!"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>2.Swift函数可以返回多个返回值，这个功能真是太猛了。<br><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">minMax</span><span class="params">(array: [Int])</span></span> -&gt; (<span class="built_in">min</span>: <span class="type">Int</span>, <span class="built_in">max</span>: <span class="type">Int</span>) &#123;</span><br><span class="line">    <span class="keyword">var</span> currentMin = array[<span class="number">0</span>]</span><br><span class="line">    <span class="keyword">var</span> currentMax = array[<span class="number">0</span>]</span><br><span class="line">    <span class="keyword">for</span> value <span class="keyword">in</span> array[<span class="number">1</span>..&lt;array.<span class="built_in">count</span>] &#123;</span><br><span class="line">        <span class="keyword">if</span> value &lt; currentMin &#123;</span><br><span class="line">            currentMin = value</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> value &gt; currentMax &#123;</span><br><span class="line">            currentMax = value</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> (currentMin, currentMax)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>3.Swift函数可以接收不定参数，跟Java基本类似的用法。<br>4.函数可以嵌套，这个是Java或者C++都没有的，挺好用。例如经常有一段逻辑，用一个函数实现太长，在Java或者C++中，通常是会把它拆分成几个函数，保持每个函数短小，功能单一。但是这样拆分的函数并不能很好的表明他们是一个功能的，不够“内聚”。用这种Swift函数嵌套的方式就能较好实现。<br><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">chooseStepFunction</span><span class="params">(backwards: Bool)</span></span> -&gt; (<span class="type">Int</span>) -&gt; <span class="type">Int</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">stepForward</span><span class="params">(input: Int)</span></span> -&gt; <span class="type">Int</span> &#123; </span><br><span class="line">        <span class="keyword">return</span> input + <span class="number">1</span> </span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">stepBackward</span><span class="params">(input: Int)</span></span> -&gt; <span class="type">Int</span> &#123; </span><br><span class="line">        <span class="keyword">return</span> input - <span class="number">1</span> </span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> backwards ? stepBackward : stepForward</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>5.Swift支持函数类型，根据输入参数和返回值确定一个函数类型。函数类型可以让函数像，普通数据类型一样使用。例如函数的参数可以另外一个函数，注意，不是另外一个函数的返回值，而是另外一个函数，只要类型符合即可。这个相当于是函数级别的多态，真的有点猛。<br><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//定义一个函数，类型是(Int, Int)-&gt;Int</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">addTwoInts</span><span class="params">(a: Int, <span class="number">_</span> b: Int)</span></span> -&gt; <span class="type">Int</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> a + b</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//定义另一个函数，其中一个参数是(Int, Int) -&gt; Int函数</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">printMathResult</span><span class="params">(mathFunction: <span class="params">(Int, Int)</span></span></span> -&gt; <span class="type">Int</span>, <span class="number">_</span> a: <span class="type">Int</span>, <span class="number">_</span> b: <span class="type">Int</span>) &#123;</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">"Result: \(mathFunction(a, b))"</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//直接将addTwoInts()作为printMathResult()的参数</span></span><br><span class="line">printMathResult(addTwoInts, <span class="number">3</span>, <span class="number">5</span>)</span><br></pre></td></tr></table></figure></p>
+<p>6.Swift支持闭包，我觉得可以理解成“匿名函数”，只需要描述输入输出，用in分开输入输出描述，已经函数体，无需定义函数名。</p>
+<h3 id="类与结构"><a href="#类与结构" class="headerlink" title="类与结构"></a>类与结构</h3><p>1.类的构造函数，直接叫init()。类函数调用跟Java，C++基本一样。self相当于Java中的this。<br>2.在Swift中class的成员访问权限控制级别有public, internal, private，类似Java中的public, protected, private。<br>3.deinit是析构函数。Java中也有finalize()函数。不过Java的finalize()函数并不确保一定被调用，所以并不推荐override该函数。<br>4.类的继承跟C++有点像，使用:。<br><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SomeSubclass</span>: <span class="title">SomeSuperclass</span> </span>&#123;</span><br><span class="line">    <span class="comment">// subclass definition goes here</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>5.他的setter和getter函数跟Java不太一样，是隐式调用的。我觉得Swift的设计思想是，用户只需关心输入和输出，其他的不用关心。例如此处只需关心需要set或者get。具体的set和get函数则是封装的，无需使用者去关心。又譬如上面提到的method的type，只要定义了输入和输出，就定义了一类method，那就可以对这种type有多种具体实现。<br><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">Point</span> </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> x = <span class="number">0.0</span>, y = <span class="number">0.0</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">Size</span> </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> width = <span class="number">0.0</span>, height = <span class="number">0.0</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">Rect</span> </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> origin = <span class="type">Point</span>()</span><br><span class="line">    <span class="keyword">var</span> size = <span class="type">Size</span>()</span><br><span class="line">    <span class="keyword">var</span> center: <span class="type">Point</span> &#123;</span><br><span class="line">        <span class="keyword">get</span> &#123;</span><br><span class="line">            <span class="keyword">let</span> centerX = origin.x + (size.width / <span class="number">2</span>)</span><br><span class="line">            <span class="keyword">let</span> centerY = origin.y + (size.height / <span class="number">2</span>)</span><br><span class="line">            <span class="keyword">return</span> <span class="type">Point</span>(x: centerX, y: centerY)</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">set</span>(newCenter) &#123;</span><br><span class="line">            origin.x = newCenter.x - (size.width / <span class="number">2</span>)</span><br><span class="line">            origin.y = newCenter.y - (size.height / <span class="number">2</span>)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> square = <span class="type">Rect</span>(origin: <span class="type">Point</span>(x: <span class="number">0.0</span>, y: <span class="number">0.0</span>),</span><br><span class="line">    size: <span class="type">Size</span>(width: <span class="number">10.0</span>, height: <span class="number">10.0</span>))</span><br><span class="line"><span class="keyword">let</span> initialSquareCenter = square.center</span><br><span class="line">square.center = <span class="type">Point</span>(x: <span class="number">15.0</span>, y: <span class="number">15.0</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">"square.origin is now at (\(square.origin.x), \(square.origin.y))"</span>)</span><br></pre></td></tr></table></figure></p>
+<p>6.Swift的枚举和Java类似，本质是一个类，里面可以包含函数。<br>7.Swift的struct和class写法基本一样，区别在于struct传递的是内容的copy，而class传递的是引用。这个厉害啊。<br>8.枚举还支持associated value，这个是Java没有的。<br><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">enum</span> <span class="title">Barcode</span> </span>&#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="type">UPCA</span>(<span class="type">Int</span>, <span class="type">Int</span>, <span class="type">Int</span>, <span class="type">Int</span>)</span><br><span class="line">    <span class="keyword">case</span> <span class="type">QRCode</span>(<span class="type">String</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> productBarcode = <span class="type">Barcode</span>.<span class="type">UPCA</span>(<span class="number">8</span>, <span class="number">85909</span>, <span class="number">51226</span>, <span class="number">3</span>)</span><br></pre></td></tr></table></figure></p>
+<p>9.protocol类似于Java中的interface。<br>10.extension比较强大，甚至变态，可以动态往某个类中增添函数以及成员变量，动态让某个类实现某个protocol，而无需修改该类源代码。Java新增成员变量，新增函数，实现某个interface，Java都只能通过继承实现。而这个直接实现，且对一切该类的对象生效，包括extend之前已经创建的对象。<br><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">extension</span> <span class="title">Double</span> </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> km: <span class="type">Double</span> &#123; <span class="keyword">return</span> <span class="keyword">self</span> * <span class="number">1_000.0</span> &#125;</span><br><span class="line">    <span class="keyword">var</span> m: <span class="type">Double</span> &#123; <span class="keyword">return</span> <span class="keyword">self</span> &#125;</span><br><span class="line">    <span class="keyword">var</span> cm: <span class="type">Double</span> &#123; <span class="keyword">return</span> <span class="keyword">self</span> / <span class="number">100.0</span> &#125;</span><br><span class="line">    <span class="keyword">var</span> mm: <span class="type">Double</span> &#123; <span class="keyword">return</span> <span class="keyword">self</span> / <span class="number">1_000.0</span> &#125;</span><br><span class="line">    <span class="keyword">var</span> ft: <span class="type">Double</span> &#123; <span class="keyword">return</span> <span class="keyword">self</span> / <span class="number">3.28084</span> &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">let</span> oneInch = <span class="number">25.4</span>.mm</span><br><span class="line"><span class="built_in">print</span>(<span class="string">"One inch is \(oneInch) meters"</span>)</span><br><span class="line"><span class="comment">// prints "One inch is 0.0254 meters"</span></span><br><span class="line"><span class="keyword">let</span> threeFeet = <span class="number">3</span>.ft</span><br><span class="line"><span class="built_in">print</span>(<span class="string">"Three feet is \(threeFeet) meters"</span>)</span><br><span class="line"><span class="comment">// prints "Three feet is 0.914399970739201 meters"</span></span><br></pre></td></tr></table></figure></p>
+<p>11.Swift泛型和Java类似的，Swift的泛型支持where语句，可以在对类型控制之外，作更加精细的控制。<br><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">allItemsMatch</span>&lt;</span><br><span class="line">    C1: Container, C2: Container</span><br><span class="line">    where C1.ItemType == C2.ItemType, C1.ItemType: Equatable&gt;</span><br><span class="line">    <span class="params">(someContainer: C1, <span class="number">_</span> anotherContainer: C2)</span></span> -&gt; <span class="type">Bool</span> &#123;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// check that both containers contain the same number of items</span></span><br><span class="line">        <span class="keyword">if</span> someContainer.<span class="built_in">count</span> != anotherContainer.<span class="built_in">count</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">false</span></span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// check each pair of items to see if they are equivalent</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="number">0</span>..&lt;someContainer.<span class="built_in">count</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> someContainer[i] != anotherContainer[i] &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">false</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// all items match, so return true</span></span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">        </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="内存管理"><a href="#内存管理" class="headerlink" title="内存管理"></a>内存管理</h3><p>Swift和Java类似，也无需自己管理内存，Swift是由ARC(Automatic Reference Counting)机制来回收内存的，Java是有垃圾回收机制来保证内存被及时回收。但是两者的回收机制有所区别。我的理解是Swift的ARC机制着眼于无效的对象，就是那些没有被任何人引用到的对象。因此，如果两个对象循环引用，就会无法被回收，引起泄露。此时就需要Weak Reference或者Unowned Reference来打破这个环。<br>下图中Person对象和Apartment对象由于互相强引用，无法被ARC回收。<br><img src="http://img1.tbcdn.cn/L1/461/1/36f8571ac833b313ef3800ac748d263016d5d69c.png" alt="screenshot"></p>
+<p>而Java的垃圾回收机制，从反面思考，着眼于哪些是有效的对象，即有被GC Root引用到的对象是有效的，其他的都是无效的。因此哪怕有对象相互引用，只要没有被GC Root引用到，都会被垃圾回收器回收掉（如下图所示）。从这此处来看，Java的策略更优。也由此可以看到换个角度看问题是多么重要。<br><img src="http://img1.tbcdn.cn/L1/461/1/68c256f96b0feef9a57114f2e171c5da33af9b68.png" alt="screenshot"></p>
+<h3 id="参考引用"><a href="#参考引用" class="headerlink" title="参考引用"></a>参考引用</h3><ol>
+<li>The Swift Programming Language (Swift 2.1) <a href="https://developer.apple.com/library/ios/documentation/Swift/Conceptual/Swift_Programming_Language/index.html#//apple_ref/doc/uid/TP40014097-CH3-ID0" target="_blank" rel="external">https://developer.apple.com/library/ios/documentation/Swift/Conceptual/Swift_Programming_Language/index.html#//apple_ref/doc/uid/TP40014097-CH3-ID0</a></li>
+<li>what is the entry point of swift code execution? <a href="http://stackoverflow.com/questions/24105690/what-is-the-entry-point-of-swift-code-execution" target="_blank" rel="external">http://stackoverflow.com/questions/24105690/what-is-the-entry-point-of-swift-code-execution</a></li>
+<li>Swift程序入口深度分析 <a href="http://00red.com/blog/2014/11/20/swift-main-study/" target="_blank" rel="external">http://00red.com/blog/2014/11/20/swift-main-study/</a></li>
+<li>Swift 函数式编程实践 <a href="http://codebuild.me/2015/09/15/swift-functional-programming-intro/" target="_blank" rel="external">http://codebuild.me/2015/09/15/swift-functional-programming-intro/</a></li>
+<li>Java vs Swift <a href="http://slidenerd.com/2014/11/15/swift-vs-java/" target="_blank" rel="external">http://slidenerd.com/2014/11/15/swift-vs-java/</a></li>
+<li>SwiftGuide <a href="https://github.com/ipader/SwiftGuide" target="_blank" rel="external">https://github.com/ipader/SwiftGuide</a></li>
+<li>Swift <a href="https://developer.apple.com/swift/" target="_blank" rel="external">https://developer.apple.com/swift/</a></li>
+<li>Learn the Essentials of Swift <a href="https://developer.apple.com/library/prerelease/ios/referencelibrary/GettingStarted/DevelopiOSAppsSwift/Lesson1.html" target="_blank" rel="external">https://developer.apple.com/library/prerelease/ios/referencelibrary/GettingStarted/DevelopiOSAppsSwift/Lesson1.html</a></li>
+<li>What is an “unwrapped value” in Swift? <a href="http://stackoverflow.com/questions/24034483/what-is-an-unwrapped-value-in-swift" target="_blank" rel="external">http://stackoverflow.com/questions/24034483/what-is-an-unwrapped-value-in-swift</a></li>
+<li>自动引用计数 <a href="https://numbbbbb.gitbooks.io/-the-swift-programming-language-/content/chapter2/16_Automatic_Reference_Counting.html" target="_blank" rel="external">https://numbbbbb.gitbooks.io/-the-swift-programming-language-/content/chapter2/16_Automatic_Reference_Counting.html</a></li>
+</ol>
+
+      
+    </div>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2016/05/07/Android常见的Event-driven方案/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption"><</strong>
+      <div class="article-nav-title">
+        
+          Android常见的Event-driven方案
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2016/05/07/ThreadLocal源码分析/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">ThreadLocal源码分析</div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+<div class="share_jia">
+	<!-- JiaThis Button BEGIN -->
+	<div class="jiathis_style">
+		<span class="jiathis_txt">Share to: &nbsp; </span>
+		<a class="jiathis_button_facebook"></a> 
+    <a class="jiathis_button_twitter"></a>
+    <a class="jiathis_button_plus"></a> 
+    <a class="jiathis_button_tsina"></a>
+		<a class="jiathis_button_cqq"></a>
+		<a class="jiathis_button_douban"></a>
+		<a class="jiathis_button_weixin"></a>
+		<a class="jiathis_button_tumblr"></a>
+    <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank"></a>
+	</div>
+	<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=1405949716054953" charset="utf-8"></script>
+	<!-- JiaThis Button END -->
+</div>
+
+
+
+
+
+
+<div class="duoshuo">
+	<!-- 多说评论框 start -->
+	<div class="ds-thread" data-thread-key="from-java-to-swift" data-title="从Java到Swift" data-url="http://yoursite.com/2016/05/07/from-java-to-swift/"></div>
+	<!-- 多说评论框 end -->
+	<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+	<script type="text/javascript">
+	var duoshuoQuery = {short_name:"true"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+	<!-- 多说公共JS代码 end -->
+</div>
+
+
+
+
+</div>
+      <footer id="footer">
+  <div class="outer">
+    <div id="footer-info">
+    	<div class="footer-left">
+    		&copy; 2016 Light Zhang
+    	</div>
+      	<div class="footer-right">
+      		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
+      	</div>
+    </div>
+  </div>
+</footer>
+    </div>
+    
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+
+<script>
+	var yiliaConfig = {
+		fancybox: true,
+		mathjax: true,
+		animate: true,
+		isHome: false,
+		isPost: true,
+		isArchive: false,
+		isTag: false,
+		isCategory: false,
+		open_in_new: false
+	}
+</script>
+<script src="http://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+<script src="/js/main.js"></script>
+
+
+
+
+
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';                 
+    }       
+});
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+  </div>
+</body>
+</html>
