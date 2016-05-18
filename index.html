@@ -70,7 +70,7 @@
 						<li>Tags</li>
 						
 						
-						<li>About</li>
+						<li>Über</li>
 						
 					</ul>
 				</div>
@@ -107,7 +107,7 @@
 				
 				<section class="switch-part switch-part2">
 					<div class="widget tagcloud" id="js-tagcloud">
-						<a href="/tags/AOP/" style="font-size: 10px;">AOP</a> <a href="/tags/Android/" style="font-size: 20px;">Android</a> <a href="/tags/Design/" style="font-size: 10px;">Design</a> <a href="/tags/Event-Driven/" style="font-size: 10px;">Event Driven</a> <a href="/tags/Java/" style="font-size: 15px;">Java</a> <a href="/tags/Swift/" style="font-size: 10px;">Swift</a> <a href="/tags/mobile/" style="font-size: 10px;">mobile</a> <a href="/tags/translation/" style="font-size: 10px;">translation</a> <a href="/tags/杂思/" style="font-size: 10px;">杂思</a>
+						<a href="/tags/AOP/" style="font-size: 10px;">AOP</a> <a href="/tags/Android/" style="font-size: 20px;">Android</a> <a href="/tags/Binder/" style="font-size: 10px;">Binder</a> <a href="/tags/Design/" style="font-size: 10px;">Design</a> <a href="/tags/Event-Driven/" style="font-size: 10px;">Event Driven</a> <a href="/tags/Java/" style="font-size: 15px;">Java</a> <a href="/tags/Swift/" style="font-size: 10px;">Swift</a> <a href="/tags/mobile/" style="font-size: 10px;">mobile</a> <a href="/tags/translation/" style="font-size: 10px;">translation</a> <a href="/tags/杂思/" style="font-size: 10px;">杂思</a>
 					</div>
 				</section>
 				
@@ -172,6 +172,72 @@
 </nav>
 
       <div class="body-wrap">
+  
+    <article id="post-BinderStudy" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2016/05/18/BinderStudy/" class="article-date">
+  	<time datetime="2016-05-18T11:49:33.000Z" itemprop="datePublished">2016-05-18</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/05/18/BinderStudy/">Android Binder学习的故事</a>
+    </h1>
+  
+
+      </header>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>看Android源码无论如何绕不开Binder，因此我一直对Binder的实现机制有浓厚的兴趣。无奈本人功力不够，所以对此一直没有清晰的认识。看了网上一些分析Binder的文章，基本都是源码分析，我觉得对于Binder这样一种比较复杂的框架，最好不要一开始就进入到源码这么细节的层面，很容易找不到北。我觉得应该先撇开代码，有原理性的介绍，再根据个人需要深入代码去分析。因为没有找到合适的文章，所以我就想自己来探究，自己来写，我主要想解决以下几个问题：</p>
+<ol>
+<li>Binder的历史？</li>
+<li>Binder和Linux原有的IPC有什么区别，为什么一定要用Binder？</li>
+<li>Binder整体的设计是怎样的？</li>
+<li>Binder的跨进程数据传输是怎么实现的？</li>
+</ol>
+<p>但是，正当我准备自己动手探究时，却找到一篇很不错的文章<a href="http://www.programering.com/a/MjMyMDMwATQ.html" target="_blank" rel="external">Android Binder design and implementation design</a>，一下子把我的问题都回答了，开心，又有点失落。这真是一篇高质量的文章，我想我可以把它翻译成中文，跟大家分享。然而紧接着在里面一个例子中看到”Zhang San”。心里惊呼“难道原文是中文？”。还真找到了，原文在CSDN上<a href="http://blog.csdn.net/universus/article/details/6211589" target="_blank" rel="external">Android Bander设计与实现 - 设计篇</a>。这下只有为国人感到自豪了。这篇文章清晰地阐述了Binder的设计实现机制，清晰易懂。</p>
+<p>整体的设计已经了然于胸，就可以自己去看代码，亲自触摸里面的实现细节。网上有不少源码分析的文章，最有名的要数<a href="http://blog.csdn.net/luoshengyang/article/details/6618363" target="_blank" rel="external">老罗</a>的。但是我觉得源码就像一个丰富的宝库，源码分析应该是带着问题，有目的地去分析，不然只会被别人牵着鼻子走，或者迷失其中。就像老罗在系统地分析Android源码前也是看了很多书（见<a href="http://blog.csdn.net/luoshengyang/article/details/8923485" target="_blank" rel="external">那两年炼就的Android内功修养</a>）。</p>
+<p>除了阅读源码，了解Binder的实现细节，我还想了解Linux原有的IPC机制，例如管道，System V IPC，socket是如何设计的，其设计思想和出发点各有什么不同？此处先留着问题，后面再探究总结。</p>
+
+      
+    </div>
+    
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android/">Android</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Binder/">Binder</a></li></ul>
+	</div>
+
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+    
+  </div>
+  
+</article>
+
+
+
+
+
+
+
+
+
   
     <article id="post-杂思（2016-5-9-2016-5-14）" class="article article-type-post" itemscope itemprop="blogPost">
   

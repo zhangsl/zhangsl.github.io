@@ -4,18 +4,18 @@
   <meta charset="utf-8">
   
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
-  <title>所有标签 | Light&#39;s Blog</title>
+  <title>Android Binder学习的故事 | Light&#39;s Blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description">
-<meta property="og:type" content="website">
-<meta property="og:title" content="所有标签">
-<meta property="og:url" content="http://yoursite.com/tags/index.html">
+  <meta name="description" content="看Android源码无论如何绕不开Binder，因此我一直对Binder的实现机制有浓厚的兴趣。无奈本人功力不够，所以对此一直没有清晰的认识。看了网上一些分析Binder的文章，基本都是源码分析，我觉得对于Binder这样一种比较复杂的框架，最好不要一开始就进入到源码这么细节的层面，很容易找不到北。我觉得应该先撇开代码，有原理性的介绍，再根据个人需要深入代码去分析。因为没有找到合适的文章，所以我就">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android Binder学习的故事">
+<meta property="og:url" content="http://yoursite.com/2016/05/18/BinderStudy/index.html">
 <meta property="og:site_name" content="Light's Blog">
-<meta property="og:description">
-<meta property="og:updated_time" content="2016-05-07T08:20:38.000Z">
+<meta property="og:description" content="看Android源码无论如何绕不开Binder，因此我一直对Binder的实现机制有浓厚的兴趣。无奈本人功力不够，所以对此一直没有清晰的认识。看了网上一些分析Binder的文章，基本都是源码分析，我觉得对于Binder这样一种比较复杂的框架，最好不要一开始就进入到源码这么细节的层面，很容易找不到北。我觉得应该先撇开代码，有原理性的介绍，再根据个人需要深入代码去分析。因为没有找到合适的文章，所以我就">
+<meta property="og:updated_time" content="2016-05-18T12:34:13.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="所有标签">
-<meta name="twitter:description">
+<meta name="twitter:title" content="Android Binder学习的故事">
+<meta name="twitter:description" content="看Android源码无论如何绕不开Binder，因此我一直对Binder的实现机制有浓厚的兴趣。无奈本人功力不够，所以对此一直没有清晰的认识。看了网上一些分析Binder的文章，基本都是源码分析，我觉得对于Binder这样一种比较复杂的框架，最好不要一开始就进入到源码这么细节的层面，很容易找不到北。我觉得应该先撇开代码，有原理性的介绍，再根据个人需要深入代码去分析。因为没有找到合适的文章，所以我就">
   
     <link rel="alternative" href="/atom.xml" title="Light&#39;s Blog" type="application/atom+xml">
   
@@ -172,11 +172,11 @@
 	</div>
 </nav>
 
-      <div class="body-wrap"><article id="page-undefined" class="article article-type-page" itemscope itemprop="blogPost">
+      <div class="body-wrap"><article id="post-BinderStudy" class="article article-type-post" itemscope itemprop="blogPost">
   
     <div class="article-meta">
-      <a href="/tags/index.html" class="article-date">
-  	<time datetime="2016-05-07T08:18:33.000Z" itemprop="datePublished">2016-05-07</time>
+      <a href="/2016/05/18/BinderStudy/" class="article-date">
+  	<time datetime="2016-05-18T11:49:33.000Z" itemprop="datePublished">2016-05-18</time>
 </a>
     </div>
   
@@ -189,7 +189,7 @@
         
   
     <h1 class="article-title" itemprop="name">
-      所有标签
+      Android Binder学习的故事
     </h1>
   
 
@@ -197,6 +197,10 @@
       
       <div class="article-info article-info-post">
         
+	<div class="article-tag tagcloud">
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android/">Android</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Binder/">Binder</a></li></ul>
+	</div>
+
         
 
         <div class="clearfix"></div>
@@ -205,13 +209,33 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        
+        <p>看Android源码无论如何绕不开Binder，因此我一直对Binder的实现机制有浓厚的兴趣。无奈本人功力不够，所以对此一直没有清晰的认识。看了网上一些分析Binder的文章，基本都是源码分析，我觉得对于Binder这样一种比较复杂的框架，最好不要一开始就进入到源码这么细节的层面，很容易找不到北。我觉得应该先撇开代码，有原理性的介绍，再根据个人需要深入代码去分析。因为没有找到合适的文章，所以我就想自己来探究，自己来写，我主要想解决以下几个问题：</p>
+<ol>
+<li>Binder的历史？</li>
+<li>Binder和Linux原有的IPC有什么区别，为什么一定要用Binder？</li>
+<li>Binder整体的设计是怎样的？</li>
+<li>Binder的跨进程数据传输是怎么实现的？</li>
+</ol>
+<p>但是，正当我准备自己动手探究时，却找到一篇很不错的文章<a href="http://www.programering.com/a/MjMyMDMwATQ.html" target="_blank" rel="external">Android Binder design and implementation design</a>，一下子把我的问题都回答了，开心，又有点失落。这真是一篇高质量的文章，我想我可以把它翻译成中文，跟大家分享。然而紧接着在里面一个例子中看到”Zhang San”。心里惊呼“难道原文是中文？”。还真找到了，原文在CSDN上<a href="http://blog.csdn.net/universus/article/details/6211589" target="_blank" rel="external">Android Bander设计与实现 - 设计篇</a>。这下只有为国人感到自豪了。这篇文章清晰地阐述了Binder的设计实现机制，清晰易懂。</p>
+<p>整体的设计已经了然于胸，就可以自己去看代码，亲自触摸里面的实现细节。网上有不少源码分析的文章，最有名的要数<a href="http://blog.csdn.net/luoshengyang/article/details/6618363" target="_blank" rel="external">老罗</a>的。但是我觉得源码就像一个丰富的宝库，源码分析应该是带着问题，有目的地去分析，不然只会被别人牵着鼻子走，或者迷失其中。就像老罗在系统地分析Android源码前也是看了很多书（见<a href="http://blog.csdn.net/luoshengyang/article/details/8923485" target="_blank" rel="external">那两年炼就的Android内功修养</a>）。</p>
+<p>除了阅读源码，了解Binder的实现细节，我还想了解Linux原有的IPC机制，例如管道，System V IPC，socket是如何设计的，其设计思想和出发点各有什么不同？此处先留着问题，后面再探究总结。</p>
+
       
     </div>
     
   </div>
   
     
+<nav id="article-nav">
+  
+  
+    <a href="/2016/05/09/杂思（2016-5-9-2016-5-14）/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">杂思（2016.5.9~2016.5.14）</div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
   
 </article>
 
@@ -237,6 +261,26 @@
 
 
 
+
+
+<div class="duoshuo">
+	<!-- 多说评论框 start -->
+	<div class="ds-thread" data-thread-key="BinderStudy" data-title="Android Binder学习的故事" data-url="http://yoursite.com/2016/05/18/BinderStudy/"></div>
+	<!-- 多说评论框 end -->
+	<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+	<script type="text/javascript">
+	var duoshuoQuery = {short_name:"true"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+	<!-- 多说公共JS代码 end -->
+</div>
 
 
 
@@ -265,7 +309,7 @@
 		mathjax: true,
 		animate: true,
 		isHome: false,
-		isPost: false,
+		isPost: true,
 		isArchive: false,
 		isTag: false,
 		isCategory: false,
