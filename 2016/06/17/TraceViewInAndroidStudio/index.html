@@ -4,21 +4,23 @@
   <meta charset="utf-8">
   
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
-  <title>遗书（2016.6.11） | Light&#39;s Blog</title>
+  <title>天猫Android性能优化1—AndroidStudio内置的Traceview视图 | Light&#39;s Blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="听说在西方，有些人每年都会更新自己的遗书，我觉得这是一个很好的习惯，因为无论老少，都要面对生死，因此无须避讳。虽然我正当青春，我想我同样需要这样一份书，倘若突发变故，也可以向家人朋友表明我的心意。倘若我偶然离世，与我自己而言，是好得无比的。我真信仰我主耶稣基督，真知道他的拯救是可靠的，他所预备在天上的房屋是荣耀的，我也要在他里面享受永远的生命。
-但是对于家人而言，我想会非常难过吧。至亲之人离去总是">
+  <meta name="description" content="Traceview是分析Android性能不可或缺的利器。目前一般是用DDMS或者ADT里面的traceview工具来查看的。哪怕是AndroidStudio官网也是如此推荐。一个偶然的机会，发现AndroidStudio本身可以查看Traceview文件，而且更直观。它分成三部分：顶部工具栏，中间的“Flamechart”显示执行过程及调用堆栈，底部的表格显示该线程中各个函数的执行时间与调用次数">
 <meta property="og:type" content="article">
-<meta property="og:title" content="遗书（2016.6.11）">
-<meta property="og:url" content="http://yoursite.com/2016/06/11/遗书（2016-6-11）/index.html">
+<meta property="og:title" content="天猫Android性能优化1—AndroidStudio内置的Traceview视图">
+<meta property="og:url" content="http://yoursite.com/2016/06/17/TraceViewInAndroidStudio/index.html">
 <meta property="og:site_name" content="Light's Blog">
-<meta property="og:description" content="听说在西方，有些人每年都会更新自己的遗书，我觉得这是一个很好的习惯，因为无论老少，都要面对生死，因此无须避讳。虽然我正当青春，我想我同样需要这样一份书，倘若突发变故，也可以向家人朋友表明我的心意。倘若我偶然离世，与我自己而言，是好得无比的。我真信仰我主耶稣基督，真知道他的拯救是可靠的，他所预备在天上的房屋是荣耀的，我也要在他里面享受永远的生命。
-但是对于家人而言，我想会非常难过吧。至亲之人离去总是">
-<meta property="og:updated_time" content="2016-06-11T04:18:21.000Z">
+<meta property="og:description" content="Traceview是分析Android性能不可或缺的利器。目前一般是用DDMS或者ADT里面的traceview工具来查看的。哪怕是AndroidStudio官网也是如此推荐。一个偶然的机会，发现AndroidStudio本身可以查看Traceview文件，而且更直观。它分成三部分：顶部工具栏，中间的“Flamechart”显示执行过程及调用堆栈，底部的表格显示该线程中各个函数的执行时间与调用次数">
+<meta property="og:image" content="http://img4.tbcdn.cn/L1/461/1/6aae7c26e102a37b9bbca6dd166f50253a239e35">
+<meta property="og:image" content="http://img4.tbcdn.cn/L1/461/1/97cbf2465fc6278a0faca8b3e1cf61a88a0ceade">
+<meta property="og:image" content="http://img2.tbcdn.cn/L1/461/1/228aaa5cec6ac9dc442a1c7012fb156a3abb5bdd">
+<meta property="og:image" content="http://img1.tbcdn.cn/L1/461/1/87183fa55cd82de664094d755d5240e8218499d8">
+<meta property="og:updated_time" content="2016-06-17T13:44:51.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="遗书（2016.6.11）">
-<meta name="twitter:description" content="听说在西方，有些人每年都会更新自己的遗书，我觉得这是一个很好的习惯，因为无论老少，都要面对生死，因此无须避讳。虽然我正当青春，我想我同样需要这样一份书，倘若突发变故，也可以向家人朋友表明我的心意。倘若我偶然离世，与我自己而言，是好得无比的。我真信仰我主耶稣基督，真知道他的拯救是可靠的，他所预备在天上的房屋是荣耀的，我也要在他里面享受永远的生命。
-但是对于家人而言，我想会非常难过吧。至亲之人离去总是">
+<meta name="twitter:title" content="天猫Android性能优化1—AndroidStudio内置的Traceview视图">
+<meta name="twitter:description" content="Traceview是分析Android性能不可或缺的利器。目前一般是用DDMS或者ADT里面的traceview工具来查看的。哪怕是AndroidStudio官网也是如此推荐。一个偶然的机会，发现AndroidStudio本身可以查看Traceview文件，而且更直观。它分成三部分：顶部工具栏，中间的“Flamechart”显示执行过程及调用堆栈，底部的表格显示该线程中各个函数的执行时间与调用次数">
+<meta name="twitter:image" content="http://img4.tbcdn.cn/L1/461/1/6aae7c26e102a37b9bbca6dd166f50253a239e35">
   
     <link rel="alternative" href="/atom.xml" title="Light&#39;s Blog" type="application/atom+xml">
   
@@ -175,11 +177,11 @@
 	</div>
 </nav>
 
-      <div class="body-wrap"><article id="post-遗书（2016-6-11）" class="article article-type-post" itemscope itemprop="blogPost">
+      <div class="body-wrap"><article id="post-TraceViewInAndroidStudio" class="article article-type-post" itemscope itemprop="blogPost">
   
     <div class="article-meta">
-      <a href="/2016/06/11/遗书（2016-6-11）/" class="article-date">
-  	<time datetime="2016-06-11T03:38:23.000Z" itemprop="datePublished">2016-06-11</time>
+      <a href="/2016/06/17/TraceViewInAndroidStudio/" class="article-date">
+  	<time datetime="2016-06-17T13:43:37.000Z" itemprop="datePublished">2016-06-17</time>
 </a>
     </div>
   
@@ -192,7 +194,7 @@
         
   
     <h1 class="article-title" itemprop="name">
-      遗书（2016.6.11）
+      天猫Android性能优化1—AndroidStudio内置的Traceview视图
     </h1>
   
 
@@ -201,7 +203,7 @@
       <div class="article-info article-info-post">
         
 	<div class="article-tag tagcloud">
-		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/杂思/">杂思</a></li></ul>
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android/">Android</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/性能优化/">性能优化</a></li></ul>
 	</div>
 
         
@@ -212,12 +214,25 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>听说在西方，有些人每年都会更新自己的遗书，我觉得这是一个很好的习惯，因为无论老少，都要面对生死，因此无须避讳。虽然我正当青春，我想我同样需要这样一份书，倘若突发变故，也可以向家人朋友表明我的心意。<br>倘若我偶然离世，与我自己而言，是好得无比的。我真信仰我主耶稣基督，真知道他的拯救是可靠的，他所预备在天上的房屋是荣耀的，我也要在他里面享受永远的生命。</p>
-<p>但是对于家人而言，我想会非常难过吧。至亲之人离去总是让人无法接受的，更何况是正直青年的独生子，承载所有希望的。这样的失去对于任何人都是难以忍受。面对这样的失去，如果再有一些恶意的人，在背后冷言冷语地嘲讽，就更加绝望了。但我真心的希望你们知道，神的美意好得无比，超过我们所想的。</p>
-<p><strong>请不要为亲人离去而忧伤。</strong>我们若在基督里，就不是永远地失去，只是暂时分别。从《圣经》中我们知道人是灵魂活着的，这地上用尘土做的身体，是我们暂时寄居的帐篷而已。并且不论何人，将来都要复活，只是不信耶稣的人，复活要为自己的罪受审判；而信耶稣的人，因为耶稣为我们的罪受审判，故此可以承受永远荣耀的生命。这一切并不是那么虚无缥缈。耶稣曾经真实地在地上，这是《圣经》以及其他史书明确记载的。我们也知道他真实地被钉死在十字架上，虽然本身并无什么罪。而我们也承认在我们里面的罪。因着耶稣钉十字架，我们就知道我们真是罪人，神真是公义恨恶罪恶的。神无法容忍罪恶，必要审判，甚至不惜让自己的独生爱子钉十字架，庶民犯罪，让王子代赎。从耶稣基督钉十字架，我们也真知道神真爱我们。明明是我们犯罪，神却让他的独生爱子替我们受审判，还有什么爱比这更大呢？从这里我们也看到，对于不信的人，将来要受的审判是何等可怕，神即不顾让爱子钉死来接受我们罪的审判。那些离弃耶稣救赎，自己承受审判将是何等可怕呢？从这里我们也看到，对于信的人，我们将来有荣耀的身份。因为神是用自己独生爱子舍命赎我们回来的，是极其尊贵的。所以我们的将来是真实的，请不要忧伤，悔改仰望主，主必快来。</p>
-<p><strong>请不要因为“独苗”夭折而失去所有盼望。</strong>对于不信的世人，年老的时候会把所有的希望寄托在自己的后裔上。我还没有到那个年纪，因此无法准确地体会这种心情。我想他们可能是意识到自己身体衰残，生命有限的事实，因此会把后裔看作自己生命的延续，自然而然把希望寄托在其上。正如愚公所说“子子孙孙，无穷尽也。”但是对于信的人来说，我们每个人都是独自面对神。因此我们的盼望不可能在我们的后裔身上，因为他也要独自面对神，要独自跟随主。相反，我们的盼望必然是在与神。若我们把自己的后裔当成自己的盼望，则不论他是否长寿，你都要失望的，因为他不是为你而活，他是为神而活。并且他作为人，本质就意味着是有限的，是有罪的，是靠不住的。神才是可靠的。如上面所说，基督耶稣是确实的，他的拯救也是确实的。他是可靠的。</p>
-<p><strong>请不要为恶人的言语而忧伤，为他们的无知而忧伤吧。</strong>因为他们不知道自己所说的是什么，他们更不知道自己要面临的审判是何等可怕。为他们而忧伤吧，愿他们能从自己的罪中悔改。</p>
-<p>我亲爱的家人，亲爱的朋友，愿你们喜乐！</p>
+        <p>Traceview是分析Android性能不可或缺的利器。目前一般是用DDMS或者ADT里面的traceview工具来查看的。哪怕是<a href="https://developer.android.com/studio/profile/traceview.html" target="_blank" rel="external">AndroidStudio官网</a>也是如此推荐。<br>一个偶然的机会，发现AndroidStudio本身可以查看Traceview文件，而且更直观。<br><img src="http://img4.tbcdn.cn/L1/461/1/6aae7c26e102a37b9bbca6dd166f50253a239e35" alt="screenshot"><br>它分成三部分：顶部工具栏，中间的“Flamechart”显示执行过程及调用堆栈，底部的表格显示该线程中各个函数的执行时间与调用次数。</p>
+<h3 id="顶部工具栏"><a href="#顶部工具栏" class="headerlink" title="顶部工具栏"></a>顶部工具栏</h3><p><img src="http://img4.tbcdn.cn/L1/461/1/97cbf2465fc6278a0faca8b3e1cf61a88a0ceade" alt="screenshot"></p>
+<ol>
+<li>Thread: 选择你要查看哪个线程的执行情况，默认是主线程的。</li>
+<li>x-axis: Wall Clock Time就是Real Time，该函数开始执行和结束执行之间的时间差。Thread Time就是CPU Time，真实消耗CPU的时间。</li>
+<li>Color by inclusive time: 在中间的Flamechart中，默认是根据exclusive time着色的。如果根据inclusive time着色，函数执行时间越长，颜色越深，所以顶层的函数颜色是最深的。</li>
+<li>Zoom fit：缩放用的，用鼠标滚轮也能实现。</li>
+<li>Find：查找某个函数。</li>
+</ol>
+<h3 id="中间的Flamechart"><a href="#中间的Flamechart" class="headerlink" title="中间的Flamechart"></a>中间的Flamechart</h3><p><img src="http://img2.tbcdn.cn/L1/461/1/228aaa5cec6ac9dc442a1c7012fb156a3abb5bdd" alt="screenshot"><br>横向表示时间线上函数的执行情况，长度越长，表示函数的执行时间越长。纵向表示调用堆栈。<br>以上图为例。第一行只有一个main()函数，它是函数调用堆栈的root，我们的trace一直在main()函数的执行时间内。第二行比较明显的有TMHomePageView()和TMHomePageActivity.init()函数，表示在我们trace期间，main()调用了这两个函数消耗了大部分时间。其中以TMHomePageActivity.init()最为耗时。第三行则显示了TMHomePageView()和TMHomePageActivity.init()调用的函数，以此类推。</p>
+<h3 id="底部表格"><a href="#底部表格" class="headerlink" title="底部表格"></a>底部表格</h3><p><img src="http://img1.tbcdn.cn/L1/461/1/87183fa55cd82de664094d755d5240e8218499d8" alt="screenshot"></p>
+<ol>
+<li>Name: 该列表示该线程中所执行的函数。</li>
+<li>Invocation Count: 该函数的总调用次数，包括递归调用。</li>
+<li>Inclusive Time：即Real Time，函数开始执行到执行结束的时间差。</li>
+<li>Exclusive Time: 即CPU Time, 函数正在消耗CPU的时间。</li>
+</ol>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>该视图的优点是直观，容易上手。如果你只关注某个线程上的函数执行情况，用该工具是极好的。</p>
+<h3 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h3><p>Traceview in Android Studio官方文档：<a href="http://tools.android.com/tips/traceview" target="_blank" rel="external">http://tools.android.com/tips/traceview</a></p>
 
       
     </div>
@@ -227,18 +242,9 @@
     
 <nav id="article-nav">
   
-    <a href="/2016/06/17/TraceViewInAndroidStudio/" id="article-nav-newer" class="article-nav-link-wrap">
-      <strong class="article-nav-caption"><</strong>
-      <div class="article-nav-title">
-        
-          天猫Android性能优化1—AndroidStudio内置的Traceview视图
-        
-      </div>
-    </a>
   
-  
-    <a href="/2016/05/29/杂思（2016-5-29-2016-6-5）/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">杂思（2016.5.29~2016.6.5）</div>
+    <a href="/2016/06/11/遗书（2016-6-11）/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">遗书（2016.6.11）</div>
       <strong class="article-nav-caption">></strong>
     </a>
   
@@ -273,7 +279,7 @@
 
 <div class="duoshuo">
 	<!-- 多说评论框 start -->
-	<div class="ds-thread" data-thread-key="遗书（2016-6-11）" data-title="遗书（2016.6.11）" data-url="http://yoursite.com/2016/06/11/遗书（2016-6-11）/"></div>
+	<div class="ds-thread" data-thread-key="TraceViewInAndroidStudio" data-title="天猫Android性能优化1—AndroidStudio内置的Traceview视图" data-url="http://yoursite.com/2016/06/17/TraceViewInAndroidStudio/"></div>
 	<!-- 多说评论框 end -->
 	<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
 	<script type="text/javascript">
