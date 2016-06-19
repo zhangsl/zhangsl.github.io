@@ -70,7 +70,7 @@
 						<li>Tags</li>
 						
 						
-						<li>About</li>
+						<li>Über</li>
 						
 					</ul>
 				</div>
@@ -107,7 +107,7 @@
 				
 				<section class="switch-part switch-part2">
 					<div class="widget tagcloud" id="js-tagcloud">
-						<a href="/tags/AOP/" style="font-size: 10px;">AOP</a> <a href="/tags/Android/" style="font-size: 20px;">Android</a> <a href="/tags/Binder/" style="font-size: 10px;">Binder</a> <a href="/tags/Design/" style="font-size: 10px;">Design</a> <a href="/tags/Event-Driven/" style="font-size: 10px;">Event Driven</a> <a href="/tags/Java/" style="font-size: 13.33px;">Java</a> <a href="/tags/Swift/" style="font-size: 10px;">Swift</a> <a href="/tags/mobile/" style="font-size: 10px;">mobile</a> <a href="/tags/translation/" style="font-size: 10px;">translation</a> <a href="/tags/性能优化/" style="font-size: 10px;">性能优化</a> <a href="/tags/杂思/" style="font-size: 16.67px;">杂思</a>
+						<a href="/tags/AOP/" style="font-size: 10px;">AOP</a> <a href="/tags/Android/" style="font-size: 20px;">Android</a> <a href="/tags/Binder/" style="font-size: 10px;">Binder</a> <a href="/tags/Design/" style="font-size: 10px;">Design</a> <a href="/tags/Event-Driven/" style="font-size: 10px;">Event Driven</a> <a href="/tags/Faith/" style="font-size: 10px;">Faith</a> <a href="/tags/Java/" style="font-size: 13.33px;">Java</a> <a href="/tags/Swift/" style="font-size: 10px;">Swift</a> <a href="/tags/mobile/" style="font-size: 10px;">mobile</a> <a href="/tags/translation/" style="font-size: 10px;">translation</a> <a href="/tags/性能优化/" style="font-size: 10px;">性能优化</a> <a href="/tags/杂思/" style="font-size: 16.67px;">杂思</a>
 					</div>
 				</section>
 				
@@ -172,6 +172,81 @@
 </nav>
 
       <div class="body-wrap">
+  
+    <article id="post-Hugo探究" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2016/05/07/Hugo探究/" class="article-date">
+  	<time datetime="2016-05-07T08:00:06.000Z" itemprop="datePublished">2016-05-07</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/05/07/Hugo探究/">Hugo探究</a>
+    </h1>
+  
+
+      </header>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>朋友介绍了一个开源项目<a href="https://github.com/JakeWharton/hugo" target="_blank" rel="external">Hugo</a>，国庆期间，我对它进行了一些学习和探究。</p>
+<h3 id="Hugo介绍"><a href="#Hugo介绍" class="headerlink" title="Hugo介绍"></a>Hugo介绍</h3><p>我们写代码时，常会打日志输出某个函数执行耗时，传入的参数以及返回值。那么我们能否把这件事情做的更加优雅呢？Hugo就是为此而设计的。<br>你只需要在需要监控的函数上加上@DebugLog注解，函数运行时就会自动输出上面提到的信息。<br>例如：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@DebugLog</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">getName</span><span class="params">(String first, String last)</span> </span>&#123;</span><br><span class="line">  SystemClock.sleep(<span class="number">15</span>); <span class="comment">// Don't ever really do this!</span></span><br><span class="line">  <span class="keyword">return</span> first + <span class="string">" "</span> + last;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>输出结果：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">V/Example: ⇢ getName(first=<span class="string">"Jake"</span>, last=<span class="string">"Wharton"</span>)</span><br><span class="line">V/Example: ⇠ getName [<span class="number">16</span>ms] = <span class="string">"Jake Wharton"</span></span><br></pre></td></tr></table></figure></p>
+<p>log只会在debug版本中输出（这需要写编译插件，目前只支持gradle编译），并且添加的注解也不会被VM读取，所以<strong>可以认为它对release版本没有任何影响</strong>，因此我们也可以放心地把加了注解的代码提交到代码仓库中。</p>
+<h3 id="Hugo的实现原理"><a href="#Hugo的实现原理" class="headerlink" title="Hugo的实现原理"></a>Hugo的实现原理</h3><p>要理清Hugo的实现原理，我觉得要回答两个问题：</p>
+<ol>
+<li>如何只通过加一个注解，就实现输出日志的功能？</li>
+<li>如何做到对release版毫无影响？</li>
+</ol>
+<p>我们通过分析源码来逐个解决问题。</p>
+<h4 id="1-如何输出日志？"><a href="#1-如何输出日志？" class="headerlink" title="1.如何输出日志？"></a>1.如何输出日志？</h4><p>核心代码在hugo.weaving.internal.Hugo.java中。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Aspect</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Hugo</span> </span>&#123;</span><br><span class="line">  <span class="meta">@Pointcut</span>(<span class="string">"within(@hugo.weaving.DebugLog *)"</span>)</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">withinAnnotatedClass</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@Pointcut</span>(<span class="string">"execution(* *(..)) &amp;&amp; withinAnnotatedClass()"</span>)</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">methodInsideAnnotatedType</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@Pointcut</span>(<span class="string">"execution(*.new(..)) &amp;&amp; withinAnnotatedClass()"</span>)</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">constructorInsideAnnotatedType</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@Pointcut</span>(<span class="string">"execution(@hugo.weaving.DebugLog * *(..)) || methodInsideAnnotatedType()"</span>)</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">method</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@Pointcut</span>(<span class="string">"execution(@hugo.weaving.DebugLog *.new(..)) || constructorInsideAnnotatedType()"</span>)</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">constructor</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@Around</span>(<span class="string">"method() || constructor()"</span>)</span><br><span class="line">  <span class="function"><span class="keyword">public</span> Object <span class="title">logAndExecute</span><span class="params">(ProceedingJoinPoint joinPoint)</span> <span class="keyword">throws</span> Throwable </span>&#123;</span><br><span class="line">    <span class="comment">//ProceedingJoinPoint有参数信息，输出参数的值</span></span><br><span class="line">    enterMethod(joinPoint);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">long</span> startNanos = System.nanoTime();<span class="comment">//函数执行前记录时间，像我们手动做的一样</span></span><br><span class="line">    </span><br><span class="line">    Object result = joinPoint.proceed();<span class="comment">//这里代表我们监控的函数</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">//函数执行结束时，打点记录时间，并计算耗时</span></span><br><span class="line">    <span class="keyword">long</span> stopNanos = System.nanoTime();</span><br><span class="line">    <span class="keyword">long</span> lengthMillis = TimeUnit.NANOSECONDS.toMillis(stopNanos - startNanos);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//输出函数的值，执行耗时</span></span><br><span class="line">    exitMethod(joinPoint, result, lengthMillis);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">enterMethod</span><span class="params">(JoinPoint joinPoint)</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">exitMethod</span><span class="params">(JoinPoint joinPoint, Object result, <span class="keyword">long</span> lengthMillis)</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> String <span class="title">asTag</span><span class="params">(Class&lt;?&gt; cls)</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>Hugo.java这个类有一个注解@Aspect。这里用到了<a href="https://eclipse.org/aspectj/" target="_blank" rel="external">AspectJ</a>，AspectJ是基于Java的AOP框架，关于AOP和AspectJ这里有一篇不错的中文<a href="http://www.ibm.com/developerworks/cn/java/j-lo-springaopcglib/" target="_blank" rel="external">介绍</a>。<br>到这里我们可以理解了，借助AspectJ，Hugo在编译期对有@DebugLog注解的函数加上log逻辑。<br>例如：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@DebugLog</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">printArgs</span><span class="params">(String... args)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">for</span> (String arg : args) &#123;</span><br><span class="line">    Log.i(<span class="string">"Args"</span>, arg);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>编译后，再反编译，看到的结果如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@DebugLog</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">printArgs</span><span class="params">(String... args)</span> </span>&#123;</span><br><span class="line">    JoinPoint makeJP = Factory.makeJP(ajc$tjp_0, (Object) <span class="keyword">this</span>, </span><br><span class="line">        (Object) <span class="keyword">this</span>, (Object) args);</span><br><span class="line">    Hugo.aspectOf().logAndExecute(<span class="keyword">new</span> AjcClosure1(<span class="keyword">new</span> Object[]&#123;<span class="keyword">this</span>, </span><br><span class="line">        args, makeJP&#125;).linkClosureAndJoinPoint(<span class="number">69648</span>));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title">printArgs_aroundBody0</span><span class="params">(HugoActivity ajc$<span class="keyword">this</span>, String[] args, </span><br><span class="line">    JoinPoint joinPoint)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (String arg : args) &#123;</span><br><span class="line">        Log.i(<span class="string">"Args"</span>, arg);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AjcClosure1</span> <span class="keyword">extends</span> <span class="title">AroundClosure</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">AjcClosure1</span><span class="params">(Object[] objArr)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(objArr);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">run</span><span class="params">(Object[] objArr)</span> </span>&#123;</span><br><span class="line">        Object[] objArr2 = <span class="keyword">this</span>.state;</span><br><span class="line">        HugoActivity.printArgs_aroundBody0((HugoActivity) objArr2[<span class="number">0</span>], </span><br><span class="line">            (String[]) objArr2[<span class="number">1</span>], (JoinPoint) objArr2[<span class="number">2</span>]);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>printArgs()函数已经被代理了。</p>
+<h4 id="2-如何做到对release版本无影响"><a href="#2-如何做到对release版本无影响" class="headerlink" title="2.如何做到对release版本无影响"></a>2.如何做到对release版本无影响</h4><p>根据文档，使用Hugo时，除了引入aar，还需要在gradle文件中引入Hugo插件。<br><figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apply plugin: <span class="string">'com.jakewharton.hugo'</span></span><br></pre></td></tr></table></figure></p>
+<p>插件的核心代码在hugo.weaving.plugin.HugoPlugin.groovy，核心代码如下：<br><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">project.dependencies &#123;</span><br><span class="line">    debugCompile <span class="string">'com.jakewharton.hugo:hugo-runtime:1.2.2-SNAPSHOT'</span></span><br><span class="line">    debugCompile <span class="string">'org.aspectj:aspectjrt:1.8.6'</span></span><br><span class="line">    compile <span class="string">'com.jakewharton.hugo:hugo-annotations:1.2.2-SNAPSHOT'</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这里就明白了，因为这里的依赖声明是debugCompile，故release不会输出log。<br>再来看Annotation的声明<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Target</span>(&#123;TYPE, METHOD, CONSTRUCTOR&#125;) <span class="meta">@Retention</span>(CLASS)</span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> DebugLog &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>由于注解DebugLog的RetentionPolicy是CLASS，所以它虽然会被写入class文件中，但是不会被VM读取到，对运行时没有影响。（注：项目的README中介绍说“the annotation itself is never present in the compiled class file for any build type”我觉得是不太妥，根据源码，他应该是会存在于编译后的class文件的。）</p>
+<h3 id="Hugo的价值"><a href="#Hugo的价值" class="headerlink" title="Hugo的价值"></a>Hugo的价值</h3><p>毫无疑问，Hugo可以用极小的代价帮我们实现优雅的函数监控。当然如果像我们这样使用maven打包的，我们需要自己开发maven的插件。<br>但我觉得Hugo的价值不止于此。Hugo给我们提供一种思路，在Android中，利用AOP的思路实现优雅的变成。我想类似的思想我们还可以做别的很多事情，例如统计打点，例如可以用在我们的common模块中实现模块解耦等等。</p>
+
+      
+    </div>
+    
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/AOP/">AOP</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android/">Android</a></li></ul>
+	</div>
+
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+    
+  </div>
+  
+</article>
+
+
+
+
+
+
+
+
+
   
     <article id="post-Android常见的Event-driven方案" class="article article-type-post" itemscope itemprop="blogPost">
   
