@@ -107,7 +107,7 @@
 				
 				<section class="switch-part switch-part2">
 					<div class="widget tagcloud" id="js-tagcloud">
-						<a href="/tags/AOP/" style="font-size: 10px;">AOP</a> <a href="/tags/Android/" style="font-size: 20px;">Android</a> <a href="/tags/Binder/" style="font-size: 10px;">Binder</a> <a href="/tags/Design/" style="font-size: 10px;">Design</a> <a href="/tags/Event-Driven/" style="font-size: 10px;">Event Driven</a> <a href="/tags/Faith/" style="font-size: 10px;">Faith</a> <a href="/tags/Java/" style="font-size: 13.33px;">Java</a> <a href="/tags/Swift/" style="font-size: 10px;">Swift</a> <a href="/tags/mobile/" style="font-size: 10px;">mobile</a> <a href="/tags/translation/" style="font-size: 10px;">translation</a> <a href="/tags/性能优化/" style="font-size: 10px;">性能优化</a> <a href="/tags/杂思/" style="font-size: 16.67px;">杂思</a>
+						<a href="/tags/AOP/" style="font-size: 10px;">AOP</a> <a href="/tags/Android/" style="font-size: 20px;">Android</a> <a href="/tags/Binder/" style="font-size: 10px;">Binder</a> <a href="/tags/Design/" style="font-size: 10px;">Design</a> <a href="/tags/Event-Driven/" style="font-size: 10px;">Event Driven</a> <a href="/tags/Faith/" style="font-size: 10px;">Faith</a> <a href="/tags/Java/" style="font-size: 13.33px;">Java</a> <a href="/tags/Performance/" style="font-size: 10px;">Performance</a> <a href="/tags/Swift/" style="font-size: 10px;">Swift</a> <a href="/tags/mobile/" style="font-size: 10px;">mobile</a> <a href="/tags/translation/" style="font-size: 10px;">translation</a> <a href="/tags/性能优化/" style="font-size: 10px;">性能优化</a> <a href="/tags/杂思/" style="font-size: 16.67px;">杂思</a>
 					</div>
 				</section>
 				
@@ -172,6 +172,88 @@
 </nav>
 
       <div class="body-wrap">
+  
+    <article id="post-FileIOTimeAndBufferSize" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2016/06/23/FileIOTimeAndBufferSize/" class="article-date">
+  	<time datetime="2016-06-23T13:32:41.000Z" itemprop="datePublished">2016-06-23</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/06/23/FileIOTimeAndBufferSize/">文件IO性能和Buffer Size的关系</a>
+    </h1>
+  
+
+      </header>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>以下这段代码非常常见，用于将souce文件的内容，拷贝到target文件中。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">InputStream in = <span class="keyword">new</span> FileInputStream(source);</span><br><span class="line">OutputStream out = <span class="keyword">new</span> FileOutputStream(target);</span><br><span class="line"><span class="keyword">int</span> read;</span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="keyword">while</span> ((read = in.read(buffer)) != -<span class="number">1</span>) &#123;</span><br><span class="line">        out.write(buffer, <span class="number">0</span>, read);</span><br><span class="line">    &#125;</span><br><span class="line">&#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">    <span class="keyword">throw</span> e;</span><br><span class="line">&#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">    in.close();</span><br><span class="line">    out.close();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>我们可以看到，为了优化性能，这里的读写用了buffer。如果不设置buffer，每次调用read和write都将发起一个系统IO调用，性能会比较低。那么我们该如何设置Buffer，以达到一个最优性能呢？</p>
+<h3 id="1-实验说明"><a href="#1-实验说明" class="headerlink" title="1. 实验说明"></a>1. 实验说明</h3><p>1）设备，本次实验的设备是小米3。<br>2）实验方式，对有一个104M的文件进行拷贝操作，每次拷贝调整不同的Buffer Size，从而得到Buffer Size和IO时间的关系。由于操作系统本身会对IO进行缓存，为了排除这一影响，在每次执行完拷贝后，我会再拷贝另外一个349M的文件，用于清空操作系统对实验文件的缓存（如果你有更优雅的方案，欢迎分享）。</p>
+<h3 id="2-Block-Size的整数倍"><a href="#2-Block-Size的整数倍" class="headerlink" title="2. Block Size的整数倍"></a>2. Block Size的整数倍</h3><p>在学习操作系统的IO原理时，我们发现操作系统的文件操作是以Block为单位，而不是byte为单位。因此可以想到，如果我们的Buffer不是Block Size的整数倍，将存在浪费。例如我们的Buffer Size是1.1个Block，操作系统依然会操作2个Block。我们实验验证一下。通过StatFs.getBlockSize()得到我的手机的Block Size是4096 byte。<br>实验中将我的Buffer Size分别设置成1024 byte，2048 byte，3072 byte，4096 byte，得到的结果如下。<br><img src="http://img2.tbcdn.cn/L1/461/1/d948280e2be09536f1d47e8d9de630fff4dedf9a" alt="screenshot"></p>
+<p>接下来再将Buffer Size设置成 4096 + 1，得到的结果如下：</p>
+<table>
+<thead>
+<tr>
+<th>Buffer Size</th>
+<th>Time</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>4096</td>
+<td>3643.8</td>
+</tr>
+<tr>
+<td>4097</td>
+<td>4316.8</td>
+</tr>
+</tbody>
+</table>
+<p>增加了1 byte，却造成性能大幅下降，由此可以得到我们的推测是正确的，Buffer Size应该是Block Size的整数倍。</p>
+<h3 id="3-Buffer-Size越大越好吗？"><a href="#3-Buffer-Size越大越好吗？" class="headerlink" title="3.Buffer Size越大越好吗？"></a>3.Buffer Size越大越好吗？</h3><p>好像Buffer设置越大，系统调用越少，性能越好。但是我们也要考虑到GC的影响，如果我们的Buffer设置足够大，频繁引起GC，反过来会影响我们的性能。从以下的实验中可以看到，当Buffer设置在1M以上时，IO性能提升不再明显，当Buffer设置将近5M时，性能反而下降了。<br><img src="http://img1.tbcdn.cn/L1/461/1/6e73895a66b142e64c1e45468e5d41dac504d577" alt="screenshot"></p>
+<h3 id="4-总结"><a href="#4-总结" class="headerlink" title="4. 总结"></a>4. 总结</h3><p>1）为了充分利用每次读写，Buffer Size应该设置成Block Size的整数倍。<br>2）Buffer Size应在内存利用和性能间取得平衡，一般情况看，1M左右是一个比较理想的值，但也要根据具体的情况考虑。</p>
+
+      
+    </div>
+    
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android/">Android</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Performance/">Performance</a></li></ul>
+	</div>
+
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+    
+  </div>
+  
+</article>
+
+
+
+
+
+
+
+
+
   
     <article id="post-GodWroteABook" class="article article-type-post" itemscope itemprop="blogPost">
   
@@ -753,70 +835,6 @@
       
 	<div class="article-tag tagcloud">
 		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Design/">Design</a></li></ul>
-	</div>
-
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-    
-  </div>
-  
-</article>
-
-
-
-
-
-
-
-
-
-  
-    <article id="post-Less-mobile-more-everything－重新思考Mobile" class="article article-type-post" itemscope itemprop="blogPost">
-  
-    <div class="article-meta">
-      <a href="/2016/05/07/Less-mobile-more-everything－重新思考Mobile/" class="article-date">
-  	<time datetime="2016-05-07T08:01:24.000Z" itemprop="datePublished">2016-05-07</time>
-</a>
-    </div>
-  
-  <div class="article-inner">
-    
-      <input type="hidden" class="isFancy" />
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2016/05/07/Less-mobile-more-everything－重新思考Mobile/">Less mobile, more everything－重新思考Mobile</a>
-    </h1>
-  
-
-      </header>
-      
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>在google developer上看到一篇文章<a href="https://medium.com/google-developers/less-mobile-more-everything-75e0bdcd7c1a" target="_blank" rel="external">《Less mobile, more everything》</a>。<br>这篇文章写的有点偏激，因此会比较有争议，但有些观点挺有价值，翻译出来跟大家分享。</p>
-<h3 id="译文"><a href="#译文" class="headerlink" title="译文"></a>译文</h3><blockquote>
-<p>我将要讲一些比较有争议性的观点。<br>我不喜欢用我的手机。<br>我相信手机在很多场景中存在劣势，因为它的屏幕尺寸（太小），历史环境，尤其是（不方便）的输入方式。它们非常善于消费，并且独自消费。我会继续用我的电脑完成我的工作。<br>当然不是所有人都像我这样，如果你碰巧是一个流浪汉，你会倾向继续把所有东西往手机上迁移。如果你碰巧不是一个流浪汉，我奉劝你三思。<br>个人电脑用着很爽。它有无限使用的电源；它有更好的输入方式；它有着一个巨大的屏幕，你可以同时展示很多内容，也可以更加高效进行多任务；它们，毫无疑问，是最好的，最高效的工作计算机。<br>为什么我们如此努力地把功能都往手机上面搬，而不是把它只作为众多选择之一？为什么不能让台式机，笔记本，平板电脑，手机和智能手表和谐共处？为什么我们在都没有想清楚什么是手机的情况下，就如此狭隘地认为手机会成为下一个“big thing”？手机真的代表最合适的设备吗？平板怎么样呢？<br>如果你有一个花费不菲的家可回，你会如何使用你的家，让自己感觉最舒服？你的家是一个可以很棒地浏览网页，写随笔，写开源代码的地方。它是一个安全，稳定，舒适并且通常是一个安静的地方。你买iPad不是为了拿它去公园，你通常坐在床上用它浏览新闻（iPad的主要使用场景是在家里）。在晚上的时候，你不会想要一个小屏幕的设备来看新闻。 <strong>你需要一个轻薄，大屏，无线联网，电池续航持久的设备在你的卧室中。只是你没有注意到这一点</strong> 。<br>在你大叫（反对我）之前，我也为手机感到惊叹。我有两台智能手机，数台平板。我全心拥抱手机变革，并且努力的工作（我在Google工作）让手机浏览网页的体验更好。见鬼，我自己却一直是在用iPad。我用它因为它能更好地替代手机。<br>在计算机世界，今天我们正停止多样化的尝试，把大部分的资源都投入到手机（包括可穿戴设备）。我们现在做的事不是让我们更快地发展，而是在禁锢我们的视野。<br>我挑战你发明下一个真正的居家“big thing”。当然除非你能让我们都变成流浪汉。</p>
-</blockquote>
-<h3 id="译者评论"><a href="#译者评论" class="headerlink" title="译者评论"></a>译者评论</h3><p>我认为作者在说别人狭隘的时候，自己也却很狭隘地局限在“自己居家使用”这个使用场景。他没有考虑更多地使用场景，也没有考虑更广泛的人群，例如在印度，例如在非洲，收入不高，但是上网需求强烈。所以我觉得原作者写这篇文章不够是不够严谨的。尽管如此，这篇文章也给我们带来有价值的思考，所以还是拿出来和大家分享。我觉得至少带来以下一些有价值</p>
-<h4 id="1-什么是手机？"><a href="#1-什么是手机？" class="headerlink" title="1.什么是手机？"></a>1.什么是手机？</h4><p>我想今天的手机的定义与几年前的肯定不一样了。在几年前，手机的定义是打电话发短信。而今天这只是手机的一小部分。今天以及未来，手机意味着什么？我们如此狂热追逐的究竟是什么？</p>
-<h4 id="2-我们到底需要什么？"><a href="#2-我们到底需要什么？" class="headerlink" title="2.我们到底需要什么？"></a>2.我们到底需要什么？</h4><p>由上一个问题，带出这个问题。我们需要的是握在手中的手机本身呢？还是一个更深层，更抽象可以体现我们需要的东西。这个问题可以带我们离开手机本身，而直面用户的本质需求，从而创造出比现在手机更能满足用户需求的产品。</p>
-<h4 id="3-手机可以是什么？"><a href="#3-手机可以是什么？" class="headerlink" title="3.手机可以是什么？"></a>3.手机可以是什么？</h4><p>“手机”不是我们手中握着的方块，它是我们需求的载体。如果没有乔布斯，或许我们不会想到手机还可以向今天这样。照样，从用户的根本需求出发，明天“手机”可以是什么？</p>
-
-      
-    </div>
-    
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mobile/">mobile</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/translation/">translation</a></li></ul>
 	</div>
 
       
