@@ -107,7 +107,7 @@
 				
 				<section class="switch-part switch-part2">
 					<div class="widget tagcloud" id="js-tagcloud">
-						<a href="/tags/AOP/" style="font-size: 10px;">AOP</a> <a href="/tags/Android/" style="font-size: 20px;">Android</a> <a href="/tags/Binder/" style="font-size: 10px;">Binder</a> <a href="/tags/Design/" style="font-size: 10px;">Design</a> <a href="/tags/Event-Driven/" style="font-size: 10px;">Event Driven</a> <a href="/tags/Faith/" style="font-size: 10px;">Faith</a> <a href="/tags/Java/" style="font-size: 13.33px;">Java</a> <a href="/tags/Performance/" style="font-size: 10px;">Performance</a> <a href="/tags/Swift/" style="font-size: 10px;">Swift</a> <a href="/tags/mobile/" style="font-size: 10px;">mobile</a> <a href="/tags/translation/" style="font-size: 10px;">translation</a> <a href="/tags/性能优化/" style="font-size: 10px;">性能优化</a> <a href="/tags/杂思/" style="font-size: 16.67px;">杂思</a>
+						<a href="/tags/AOP/" style="font-size: 10px;">AOP</a> <a href="/tags/Android/" style="font-size: 20px;">Android</a> <a href="/tags/Binder/" style="font-size: 10px;">Binder</a> <a href="/tags/Design/" style="font-size: 10px;">Design</a> <a href="/tags/Event-Driven/" style="font-size: 10px;">Event Driven</a> <a href="/tags/Faith/" style="font-size: 10px;">Faith</a> <a href="/tags/Java/" style="font-size: 13.33px;">Java</a> <a href="/tags/Performance/" style="font-size: 13.33px;">Performance</a> <a href="/tags/Swift/" style="font-size: 10px;">Swift</a> <a href="/tags/mobile/" style="font-size: 10px;">mobile</a> <a href="/tags/translation/" style="font-size: 10px;">translation</a> <a href="/tags/性能优化/" style="font-size: 10px;">性能优化</a> <a href="/tags/杂思/" style="font-size: 16.67px;">杂思</a>
 					</div>
 				</section>
 				
@@ -172,6 +172,80 @@
 </nav>
 
       <div class="body-wrap">
+  
+    <article id="post-tmall-performance3-activityLifecycleCallbacks" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2016/06/28/tmall-performance3-activityLifecycleCallbacks/" class="article-date">
+  	<time datetime="2016-06-28T13:25:38.000Z" itemprop="datePublished">2016-06-28</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/06/28/tmall-performance3-activityLifecycleCallbacks/">天猫Android性能优化3--ActivityLifecycleCallbacks优化</a>
+    </h1>
+  
+
+      </header>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>自4.0起，Android添加了ActivityLifecycleCallbacks接口，用于方便地全局hook各个Activity的生命周期事件。由于便捷实用，该接口被广泛使用着。</p>
+<h3 id="1-ActivityLifecycleCallbacks实现原理"><a href="#1-ActivityLifecycleCallbacks实现原理" class="headerlink" title="1. ActivityLifecycleCallbacks实现原理"></a>1. ActivityLifecycleCallbacks实现原理</h3><h4 id="1-1-注册与注销"><a href="#1-1-注册与注销" class="headerlink" title="1.1 注册与注销"></a>1.1 注册与注销</h4><p>在Application类中维护了一个ActivityLifecycleCallbacks列表，并提供相应的注册与注销函数。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Application</span> <span class="keyword">extends</span> <span class="title">ContextWrapper</span> <span class="keyword">implements</span> <span class="title">ComponentCallbacks2</span> </span>&#123;</span><br><span class="line">        ···</span><br><span class="line">        <span class="keyword">private</span> ArrayList&lt;ActivityLifecycleCallbacks&gt; mActivityLifecycleCallbacks =</span><br><span class="line">            <span class="keyword">new</span> ArrayList&lt;ActivityLifecycleCallbacks&gt;();</span><br><span class="line">                        </span><br><span class="line">                        ···</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">registerActivityLifecycleCallbacks</span><span class="params">(ActivityLifecycleCallbacks callback)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">synchronized</span> (mActivityLifecycleCallbacks) &#123;</span><br><span class="line">            mActivityLifecycleCallbacks.add(callback);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">unregisterActivityLifecycleCallbacks</span><span class="params">(ActivityLifecycleCallbacks callback)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">synchronized</span> (mActivityLifecycleCallbacks) &#123;</span><br><span class="line">            mActivityLifecycleCallbacks.remove(callback);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">        </span><br><span class="line">        ···</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h4 id="1-2-回调"><a href="#1-2-回调" class="headerlink" title="1.2 回调"></a>1.2 回调</h4><p>ActivityLifecycleCallbacks的回调接口由Activity的生命周期接口来调用，以onCreate事件为例。在以下Activity的onCreate()函数中，会调用Application.dispatchActivityCreated()函数。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">    <span class="meta">@MainThread</span></span><br><span class="line"><span class="meta">@CallSuper</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(@Nullable Bundle savedInstanceState)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (DEBUG_LIFECYCLE) Slog.v(TAG, <span class="string">"onCreate "</span> + <span class="keyword">this</span> + <span class="string">": "</span> + savedInstanceState);</span><br><span class="line">    <span class="keyword">if</span> (mLastNonConfigurationInstances != <span class="keyword">null</span>) &#123;</span><br><span class="line">        mFragments.restoreLoaderNonConfig(mLastNonConfigurationInstances.loaders);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (mActivityInfo.parentActivityName != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (mActionBar == <span class="keyword">null</span>) &#123;</span><br><span class="line">            mEnableDefaultActionBarUp = <span class="keyword">true</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            mActionBar.setDefaultDisplayHomeAsUpEnabled(<span class="keyword">true</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (savedInstanceState != <span class="keyword">null</span>) &#123;</span><br><span class="line">        Parcelable p = savedInstanceState.getParcelable(FRAGMENTS_TAG);</span><br><span class="line">        mFragments.restoreAllState(p, mLastNonConfigurationInstances != <span class="keyword">null</span></span><br><span class="line">                ? mLastNonConfigurationInstances.fragments : <span class="keyword">null</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    mFragments.dispatchCreate();</span><br><span class="line">    getApplication().dispatchActivityCreated(<span class="keyword">this</span>, savedInstanceState);</span><br><span class="line">    <span class="keyword">if</span> (mVoiceInteractor != <span class="keyword">null</span>) &#123;</span><br><span class="line">        mVoiceInteractor.attachActivity(<span class="keyword">this</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    mCalled = <span class="keyword">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>而Application.dispatchActivityCreated()函数做的事情，就是依次回调各个ActivityLifecycleCallbacks接口对应的函数。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* package */</span> <span class="function"><span class="keyword">void</span> <span class="title">dispatchActivityCreated</span><span class="params">(Activity activity, Bundle savedInstanceState)</span> </span>&#123;</span><br><span class="line">    Object[] callbacks = collectActivityLifecycleCallbacks();</span><br><span class="line">    <span class="keyword">if</span> (callbacks != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>; i&lt;callbacks.length; i++) &#123;</span><br><span class="line">            ((ActivityLifecycleCallbacks)callbacks[i]).onActivityCreated(activity,</span><br><span class="line">                    savedInstanceState);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="2-ActivityLifecycleCallbacks的性能问题"><a href="#2-ActivityLifecycleCallbacks的性能问题" class="headerlink" title="2. ActivityLifecycleCallbacks的性能问题"></a>2. ActivityLifecycleCallbacks的性能问题</h3><p>从上面的分析可知，ActivityLifecycleCallbacks有以下特点：<br>1） ActivityLifecycleCallbacks的回调是在Activity生命周期切换时被阻塞式的调用的。<br>2）它使用方便，可以无侵入地hook Activity的生命周期事件，从而有较广泛使用。</p>
+<p>低廉的使用成本，铭感的时机，很容易让它造成性能问题，影响Activity的切换性能。<br>在Android中，Activity A start Activity B，先后得经过<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">A.onPause() -&gt; B.onCreate() -&gt; B.onStart() -&gt; B.onResume() -&gt; A.onStop()</span><br></pre></td></tr></table></figure></p>
+<p>而这中间每个事件都会回调一遍所有的ActivityLifecycleCallbacks。<br>在天猫中，启动阶段走完，就会有 <strong>34个</strong> ActivityLifecycleCallbacks被注册进来，随着APP的运行，还会有新的ActivityLifecycleCallbacks会被注册进来。也就是说在天猫中启动一个新的Activity，至少回调  <strong>170次</strong> ActivityLifecycleCallbacks，如果每次耗时1毫秒，整个过程就是 <strong>170毫秒</strong> ，这就严重影响页面的切换效率了。</p>
+<h3 id="3-应对思路"><a href="#3-应对思路" class="headerlink" title="3. 应对思路"></a>3. 应对思路</h3><p>如上分析ActivityLifecycleCallbacks是会影响页面切换性能的，我们如何优化呢？</p>
+<h4 id="3-1-监控"><a href="#3-1-监控" class="headerlink" title="3.1 监控"></a>3.1 监控</h4><p>监控是首先可以想到的。由于ActivityLifecycleCallbacks是无侵入地hook的，无感知通常也意味着无监控。因此我们需要自己加强监控力度，对于耗时情况立即报警。监控思路也比较简单，只需重写Application.registerActivityLifecycleCallbacks()函数，对注册进来的ActivityLifecycleCallbacks外面包一层wrapper用于监控即可。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">    //重写注册函数，外面包上监控逻辑</span><br><span class="line">@Override</span><br><span class="line">public void registerActivityLifecycleCallbacks(ActivityLifecycleCallbacks callback) &#123;</span><br><span class="line">    if (BuildConfig.DEBUG) &#123;</span><br><span class="line">        super.registerActivityLifecycleCallbacks(new ActivityLifecycleCallbackMonitor(callback));</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        super.registerActivityLifecycleCallbacks(callback);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">    //重写注销函数，需要找到实际注册的wrapper并注销之</span><br><span class="line">@Override</span><br><span class="line">public void unregisterActivityLifecycleCallbacks(ActivityLifecycleCallbacks callback) &#123;</span><br><span class="line">    if (BuildConfig.DEBUG) &#123;</span><br><span class="line">        super.unregisterActivityLifecycleCallbacks(ActivityLifecycleCallbackMonitor.getWrapperAndRemoveOriginal(callback));</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        super.unregisterActivityLifecycleCallbacks(callback);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">/**</span><br><span class="line"> * 在debug包中，监控ActivityLifecycleCallbacks回调的耗时，每个回调超过10ms就日志报警。</span><br><span class="line"> *</span><br><span class="line"> * Created by zhangshuliang.zsl on 16/6/22.</span><br><span class="line"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ActivityLifecycleCallbackMonitor</span> <span class="keyword">implements</span> <span class="title">Application</span>.<span class="title">ActivityLifecycleCallbacks</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> Application.ActivityLifecycleCallbacks mInnerCallback;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span><br><span class="line">     * 回调执行时间阀值，超过该阀值需要报警</span><br><span class="line">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> TIME_LIMIT = <span class="number">10</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span><br><span class="line">     * 真实执行时间开始点，所谓真实执行时间即回调执行结束和执行开始之间的时间差</span><br><span class="line">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">long</span> mRealTimeBegin = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span><br><span class="line">     * CPU执行时间开始点，CPU执行时间是指该回调真实消耗CPU的时间</span><br><span class="line">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">long</span> mCpuTimeBegin = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Map&lt;Application.ActivityLifecycleCallbacks, Application.ActivityLifecycleCallbacks&gt; sOriginalToWrapperMap = <span class="keyword">new</span> HashMap&lt;Application.ActivityLifecycleCallbacks, Application.ActivityLifecycleCallbacks&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ActivityLifecycleCallbackMonitor</span><span class="params">(Application.ActivityLifecycleCallbacks callback)</span> </span>&#123;</span><br><span class="line">        mInnerCallback = callback;</span><br><span class="line">        sOriginalToWrapperMap.put(callback, ActivityLifecycleCallbackMonitor.<span class="keyword">this</span>);</span><br><span class="line">        TMLog.d(<span class="string">"TM_LIFECYCLE"</span>, <span class="string">"Number of registered ActivityLifecycleCallbacks: %d"</span>, sOriginalToWrapperMap.size());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onActivityCreated</span><span class="params">(Activity activity, Bundle savedInstanceState)</span> </span>&#123;</span><br><span class="line">        monitorStart();</span><br><span class="line">        mInnerCallback.onActivityCreated(activity, savedInstanceState);</span><br><span class="line">        monitorEnd(<span class="string">"onActivityCreated"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onActivityStarted</span><span class="params">(Activity activity)</span> </span>&#123;</span><br><span class="line">        monitorStart();</span><br><span class="line">        mInnerCallback.onActivityStarted(activity);</span><br><span class="line">        monitorEnd(<span class="string">"onActivityStarted"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onActivityResumed</span><span class="params">(Activity activity)</span> </span>&#123;</span><br><span class="line">        monitorStart();</span><br><span class="line">        mInnerCallback.onActivityResumed(activity);</span><br><span class="line">        monitorEnd(<span class="string">"onActivityResumed"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onActivityPaused</span><span class="params">(Activity activity)</span> </span>&#123;</span><br><span class="line">        monitorStart();</span><br><span class="line">        mInnerCallback.onActivityPaused(activity);</span><br><span class="line">        monitorEnd(<span class="string">"onActivityPaused"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onActivityStopped</span><span class="params">(Activity activity)</span> </span>&#123;</span><br><span class="line">        monitorStart();</span><br><span class="line">        mInnerCallback.onActivityStopped(activity);</span><br><span class="line">        monitorEnd(<span class="string">"onActivityStopped"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onActivitySaveInstanceState</span><span class="params">(Activity activity, Bundle outState)</span> </span>&#123;</span><br><span class="line">        monitorStart();</span><br><span class="line">        mInnerCallback.onActivitySaveInstanceState(activity, outState);</span><br><span class="line">        monitorEnd(<span class="string">"onActivitySaveInstanceState"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onActivityDestroyed</span><span class="params">(Activity activity)</span> </span>&#123;</span><br><span class="line">        monitorStart();</span><br><span class="line">        mInnerCallback.onActivityDestroyed(activity);</span><br><span class="line">        monitorEnd(<span class="string">"onActivityDestroyed"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span><br><span class="line">     * 根据用户注册的&#123;<span class="doctag">@link</span> Application.ActivityLifecycleCallbacks&#125;对象，获取包装后的对象。</span><br><span class="line">     *</span><br><span class="line">     * <span class="doctag">@param</span> original 根据用户注册的对象</span><br><span class="line">     * <span class="doctag">@return</span> 包装后的对象。</span><br><span class="line">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> Application.<span class="function">ActivityLifecycleCallbacks <span class="title">getWrapperAndRemoveOriginal</span><span class="params">(Application.ActivityLifecycleCallbacks original)</span> </span>&#123;</span><br><span class="line">        Application.ActivityLifecycleCallbacks callbacks = sOriginalToWrapperMap.remove(original);</span><br><span class="line">        TMLog.d(<span class="string">"TM_LIFECYCLE"</span>, <span class="string">"Number of registered ActivityLifecycleCallbacks: %d"</span>, sOriginalToWrapperMap.size());</span><br><span class="line">        <span class="keyword">return</span> callbacks;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">monitorStart</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        mRealTimeBegin = System.currentTimeMillis();</span><br><span class="line">        mCpuTimeBegin = Debug.threadCpuTimeNanos();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">monitorEnd</span><span class="params">(String event)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">long</span> realTimeCost = System.currentTimeMillis() - mRealTimeBegin;</span><br><span class="line">        <span class="keyword">long</span> cpuTimeCost = (Debug.threadCpuTimeNanos() - mCpuTimeBegin) / <span class="number">1000000</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (realTimeCost &gt; TIME_LIMIT) &#123;</span><br><span class="line">            TMLog.e(<span class="string">"TM_LIFECYCLE"</span>, <span class="string">"Activity %s Callback %s is too slow, real time is %d ms, cpu time is %d ms"</span>, event, mInnerCallback.getClass().getName(), realTimeCost, cpuTimeCost);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="3-2-异步处理"><a href="#3-2-异步处理" class="headerlink" title="3.2 异步处理"></a>3.2 异步处理</h4><p>进一步思考，ActivityLifecycleCallbacks是否应该阻塞Activity的生命周期函数执行呢？是否可以统一让他们异步处理呢，甚至在主线程闲时处理呢？从技术手段来讲，是可以的，在上面的wrapper中就可以实现。但是 <strong>存在业务上以及稳定性上的风险</strong> 。<br>从业务上来说，ActivityLifecycleCallbacks本身的行为是同步执行的，因此不排除有些业务会依赖同步执行这一逻辑做特殊的处理。如果我们在底层无感知地把它变成异步，那对这些业务就是灾难。<br>从稳定性风险来说，ActivityLifecycleCallbacks回调中有Activity对象，异步执行存在的内存泄露的风险。<br>基于上述考虑，异步处理弊大于利。</p>
+<h3 id="4-结论"><a href="#4-结论" class="headerlink" title="4. 结论"></a>4. 结论</h3><p>ActivityLifecycleCallbacks无节制的使用容易影响页面切换的性能。因此在使用ActivityLifecycleCallbacks时应考虑：</p>
+<ol>
+<li>尽可能节制，没有必要的理由不要使用ActivityLifecycleCallbacks。</li>
+<li>ActivityLifecycleCallbacks内部的逻辑应该尽可能简单高效，绝不容许有耗时操作。此处对性能应格外敏感，当你的回调函数耗时达到毫秒级就应该思考是否可以优化。</li>
+<li>加上必要的监控，及时发现性能问题并告警。</li>
+</ol>
+
+      
+    </div>
+    
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android/">Android</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Performance/">Performance</a></li></ul>
+	</div>
+
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+    
+  </div>
+  
+</article>
+
+
+
+
+
+
+
+
+
   
     <article id="post-FileIOTimeAndBufferSize" class="article article-type-post" itemscope itemprop="blogPost">
   
@@ -760,81 +834,6 @@
       
 	<div class="article-tag tagcloud">
 		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android/">Android</a></li></ul>
-	</div>
-
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-    
-  </div>
-  
-</article>
-
-
-
-
-
-
-
-
-
-  
-    <article id="post-如何学习设计" class="article article-type-post" itemscope itemprop="blogPost">
-  
-    <div class="article-meta">
-      <a href="/2016/05/07/如何学习设计/" class="article-date">
-  	<time datetime="2016-05-07T08:02:43.000Z" itemprop="datePublished">2016-05-07</time>
-</a>
-    </div>
-  
-  <div class="article-inner">
-    
-      <input type="hidden" class="isFancy" />
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2016/05/07/如何学习设计/">如何学习设计</a>
-    </h1>
-  
-
-      </header>
-      
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>从GOF的”Design Pattern”中的观点，可以看到模式的有两个要素：</p>
-<blockquote>
-<p>1.反复出现的问题；<br>2.针对该问题的解决方案。</p>
-</blockquote>
-<p>所以从这里看出学习设计模式，首先是积累问题，对问题进行归纳，分类，对比。其次是积累对问题的解决方案。<br>然而大部分人初学者都缺乏经验，学习设计模式是一个很好的思路。在看书的时候，在看书时，我觉得不是死记概念，而是可以不停地问自己这些问题：</p>
-<ol>
-<li>这个模式是针对什么问题提出的？</li>
-<li>为什么要这么做，而不那么做？</li>
-<li>这样做有什么优势和劣势？</li>
-<li>和其他类似的模式区别在哪里？</li>
-</ol>
-<p>在自己设计的时候，也这样问自己：</p>
-<ol>
-<li>我碰到什么问题，问题的本质与核心是什么？</li>
-<li>我可以用哪些方案解决问题？</li>
-<li>为什么用这些方案？各自有什么优劣势？</li>
-<li>最终选择哪个方案比较好？</li>
-</ol>
-<p>其实这是用批判性思维做设计，我觉得这样可以相对比较深入全面的了解问题，审视自己的设计。做到有理有据，心中有谱，和别人讨论时也能够给别人带去假设性的思想。同时在这个过程中，也加深自己对设计的理解。<br>我不太提倡死板套用设计模式，任何模式都是用来解决特定问题的，如果被套住，就无法深入了解其中的思想，也就不能真正做好设计，不能在已有设计上做提高。<br>同时我也不认同不用看设计模式，只要遵守设计原则就好了。我觉得看设计模式是一个很好的学习机会，是前人的总结，不能浪费。<br>另外看到一篇讲如何设计API的文章，觉得挺好，贴出来分享：<a href="http://www.infoq.com/articles/doodles-to-delivery" target="_blank" rel="external">An API Design Process</a><br>他主要讲了API设计的流程和一些注意点。但是其中我觉得他讲到一点给我挺大启发。他说设计API最重要的首先自己要清楚为什么要设计这个API，有明确的意识，是良好设计的前提。其次是设计过程中会碰到一系列决定，要做出明智的决定，当做出的决定都是明智的，这个API就坏不到哪里去。<strong>而做出明智的决定，你得先做过不好的决定，从中吸取教训，能以辨别好坏。</strong><br>这一点给我的鼓励是让我可以正面自己做过的糟糕决定，明白这也是学习的宝贵机会。不光是自己的，看到别人做的糟糕的设计，也是宝贵的学习机会，要去想为什么他的设计会失败？从中就可以吸取教训。</p>
-
-      
-    </div>
-    
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Design/">Design</a></li></ul>
 	</div>
 
       
